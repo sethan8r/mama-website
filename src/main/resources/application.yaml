@@ -1,0 +1,20 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: mama
+
+  datasource:
+    url: jdbc:postgresql://localhost:5434/historydb
+    username: postgres
+    password: sethan8r
+    #driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+      #ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true

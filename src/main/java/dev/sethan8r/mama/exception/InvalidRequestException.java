@@ -1,0 +1,9 @@
+package dev.sethan8r.mama.exception;
+
+import org.springframework.http.HttpStatus;
+
+public class InvalidRequestException extends BusinessException {
+    public InvalidRequestException(String message) {
+        super(message, HttpStatus.BAD_REQUEST);
+    }
+}
