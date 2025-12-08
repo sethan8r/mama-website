@@ -1,6 +1,5 @@
 package dev.sethan8r.mama.exception;
 
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,10 +26,11 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(ex.getStatus()).body(errorResponse);
     }
 
-    @ExceptionHandler(BadCredentialsException.class)
+    @ExceptionHandler({UsernameNotFoundException.class, BadCredentialsException.class})
     //BadCredentialsException кидает Spring Security, когда логин/пароль неверный.
-    public ResponseEntity<ErrorResponse> handleBadCredentialsException(BadCredentialsException ex) {
-        log.warn("Неверный логин или пароль: {}", ex.getMessage());
+    //UsernameNotFoundException кидает Spring Security, когда логина нету в БД
+    public ResponseEntity<ErrorResponse> handleAuthenticationError(Exception ex) {
+        log.warn("Ошибка аутентификации: {}", ex.getMessage());
 
         ErrorResponse errorResponse = new ErrorResponse("Неверный логин или пароль");
 
@@ -57,15 +57,6 @@ public class GlobalExceptionHandler {
         );
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-    }
-
-    @ExceptionHandler(UsernameNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleUserNotFound(UsernameNotFoundException ex, HttpServletRequest request) {
-        log.warn("Пользователь не найден при попытке входа на {}", request.getRequestURI());
-
-        ErrorResponse error = new ErrorResponse(ex.getMessage());
-
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
 
     @ExceptionHandler(NoResourceFoundException.class)

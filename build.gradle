@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'dev.sethan8r'
-version = '0.0.1-MAMA'
+version = '0.0.1-mama-website'
 description = 'mama'
 
 java {

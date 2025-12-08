@@ -5,4 +5,3 @@ public record PicturesWorksResponseDto(
         String name,
         String description
 ) { }
-//СМ описание в PicturesProductResponseDto
