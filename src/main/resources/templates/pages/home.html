@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ИндТурПошив</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #2d5f4f 0%, #1a3d32 100%);
+            min-height: 100vh;
+            color: #333;
+            /* ⬇️ ЗАЩИТА ОТ МАСШТАБИРОВАНИЯ */
+            zoom: 1;
+            -moz-transform: scale(1);
+            /* ⬆️ */
+        }
+
+        /* Контейнер для всего контента */
+        .main-container {
+            display: flex;
+            margin: 20px;
+            gap: 0;
+            min-height: calc(100vh - 40px);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.3);
+            /* ⬇️ СТАБИЛИЗАЦИЯ ПРИ ЗУМЕ */
+            transform: scale(1);
+            transform-origin: center top;
+            /* ⬆️ */
+        }
+
+        /* Левая часть с горой и логотипом */
+        .left-panel {
+            flex: 0 0 35%;
+            /* ⬇️ ОГРАНИЧЕНИЯ ДЛЯ СТАБИЛЬНОСТИ */
+            min-width: 35%;
+            max-width: 35%;
+            /* ⬆️ */
+            background-image: url('/images/gora.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center -85px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            margin-top: -280px;
+        }
+
+        .logo-container img {
+            width: 200px;
+            height: 200px;
+            object-fit: contain;
+            display: block;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+        }
+
+        /* Правая часть с контентом */
+        .right-panel {
+            flex: 1;
+            /* ⬇️ ОГРАНИЧЕНИЯ ДЛЯ СТАБИЛЬНОСТИ */
+            min-width: 65%;
+            max-width: 65%;
+            /* ⬆️ */
+            background: linear-gradient(135deg, #f5f5dc 0%, #e8e4d0 100%);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ⬇️ ШАПКА СВЕРХУ */
+        .top-header {
+            background: rgba(180, 180, 180, 0.25);
+            padding: 20px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid rgba(150, 150, 150, 0.2);
+        }
+
+        .top-header h1 {
+            font-size: 2.5em;
+            color: #2d5f4f;
+            font-weight: normal;
+        }
+
+        .top-header .nav-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .nav-button {
+            padding: 12px 25px;
+            background: rgba(150, 150, 150, 0.3);
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 1em;
+            color: #555;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+            font-family: 'Georgia', serif;
+        }
+
+        .nav-button:hover {
+            background: rgba(130, 130, 130, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Основной контент */
+        .content-wrapper {
+            padding: 40px 50px;
+            overflow-y: auto;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Секция контента */
+        .content-section {
+            margin-bottom: 60px;
+            min-height: 450px;
+        }
+
+        .content-section h2 {
+            font-size: 2.2em;
+            margin-bottom: 25px;
+            color: #2d5f4f;
+            font-weight: normal;
+            cursor: pointer;
+            transition: color 0.3s ease;
+            display: inline-block;
+            border-bottom: 2px solid transparent;
+        }
+
+        .content-section h2:hover {
+            color: #1a3d32;
+            border-bottom: 2px solid #2d5f4f;
+        }
+
+        /* Карусель */
+        .carousel-container {
+            position: relative;
+            overflow: hidden;
+            min-height: 320px;
+        }
+
+        .carousel-wrapper {
+            display: flex;
+            gap: 20px;
+            transition: transform 0.5s ease;
+            min-height: 320px;
+        }
+
+        .carousel-item {
+            /* ⬇️ СТАБИЛИЗАЦИЯ КАРТОЧЕК */
+            min-width: calc(33.333% - 14px);
+            max-width: calc(33.333% - 14px);
+            flex: 0 0 calc(33.333% - 14px);
+            /* ⬆️ */
+            height: 320px;
+            background: rgba(200, 200, 180, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .carousel-item:hover {
+            background: rgba(180, 180, 160, 0.4);
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .carousel-item-image {
+            flex: 1;
+            background: rgba(220, 220, 200, 0.5);
+            border-radius: 10px;
+            margin-bottom: 15px;
+            overflow: hidden;
+            height: 220px;
+        }
+
+        .carousel-item-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .carousel-item-title {
+            font-size: 1.1em;
+            font-weight: 500;
+            color: #2d5f4f;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .carousel-item-description {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+            max-height: 2.6em;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+
+        .carousel-item-price {
+            font-size: 1em;
+            color: #1a3d32;
+            margin-top: 8px;
+            font-weight: 500;
+        }
+
+        /* Стрелки карусели */
+        .carousel-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(45, 95, 79, 0.7);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.5em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .carousel-arrow:hover {
+            background: rgba(45, 95, 79, 0.9);
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .carousel-arrow.left {
+            left: -15px;
+        }
+
+        .carousel-arrow.right {
+            right: -15px;
+        }
+
+        /* Разделительная линия */
+        .divider {
+            height: 2px;
+            background: linear-gradient(to right, transparent, #2d5f4f, transparent);
+            margin: 50px 0;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 1400px) {
+            .left-panel {
+                flex: 0 0 40%;
+                min-width: 40%;
+                max-width: 40%;
+            }
+
+            .right-panel {
+                min-width: 60%;
+                max-width: 60%;
+            }
+        }
+
+        @media (max-width: 1200px) {
+            .main-container {
+                flex-direction: column;
+            }
+
+            .left-panel {
+                flex: none;
+                min-height: 500px;
+                min-width: 100%;
+                max-width: 100%;
+            }
+
+            .right-panel {
+                min-width: 100%;
+                max-width: 100%;
+            }
+
+            .carousel-item {
+                min-width: calc(50% - 10px);
+                max-width: calc(50% - 10px);
+                flex: 0 0 calc(50% - 10px);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .top-header {
+                flex-direction: column;
+                padding: 20px 25px;
+                align-items: flex-start;
+            }
+
+            .top-header h1 {
+                font-size: 1.8em;
+                margin-bottom: 15px;
+            }
+
+            .content-wrapper {
+                padding: 30px 25px;
+            }
+
+            .content-section {
+                min-height: 300px;
+            }
+
+            .content-section h2 {
+                font-size: 1.6em;
+            }
+
+            .carousel-container {
+                min-height: 280px;
+            }
+
+            .carousel-item {
+                min-width: 100%;
+                max-width: 100%;
+                flex: 0 0 100%;
+                height: 280px;
+            }
+
+            .carousel-item-image {
+                height: 180px;
+            }
+
+            .logo-container {
+                margin-top: -50px;
+            }
+
+            .logo-container img {
+                width: 150px;
+                height: 150px;
+            }
+
+            .left-panel {
+                min-height: 400px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="main-container">
+    <!-- Левая панель с горой и логотипом -->
+    <div class="left-panel">
+        <div class="logo-container">
+            <img src="/images/logo.png" alt="Логотип ИндТурПошив">
+        </div>
+    </div>
+
+    <!-- Правая панель с контентом -->
+    <div class="right-panel">
+        <!-- ⬇️ ШАПКА СВЕРХУ -->
+        <div class="top-header">
+            <h1>ИндТурПошив - пошив что-то там</h1>
+            <div class="nav-buttons">
+                <a href="#" class="nav-button">Контакты</a>
+            </div>
+        </div>
+
+        <!-- Основной контент -->
+        <div class="content-wrapper">
+            <!-- Примеры работ -->
+            <div class="content-section">
+                <h2 onclick="window.location.href='/works'">Примеры работ</h2>
+                <div class="carousel-container">
+                    <button class="carousel-arrow left" onclick="scrollCarousel('works', -1)">‹</button>
+                    <div class="carousel-wrapper" id="works-carousel">
+                        <!-- Карточки будут загружены через JS -->
+                    </div>
+                    <button class="carousel-arrow right" onclick="scrollCarousel('works', 1)">›</button>
+                </div>
+            </div>
+
+            <!-- Разделитель -->
+            <div class="divider"></div>
+
+            <!-- Каталог -->
+            <div class="content-section">
+                <h2 onclick="window.location.href='/products'">Каталог</h2>
+                <div class="carousel-container">
+                    <button class="carousel-arrow left" onclick="scrollCarousel('products', -1)">‹</button>
+                    <div class="carousel-wrapper" id="products-carousel">
+                        <!-- Карточки будут загружены через JS -->
+                    </div>
+                    <button class="carousel-arrow right" onclick="scrollCarousel('products', 1)">›</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Функции для карусели
+    const carousels = {
+        'works': { position: 0, autoScroll: null },
+        'products': { position: 0, autoScroll: null }
+    };
+
+    // Загрузка данных при загрузке страницы
+    document.addEventListener('DOMContentLoaded', async () => {
+        await loadWorks();
+        await loadProducts();
+
+        // Запуск автопрокрутки после загрузки данных
+        startAutoScroll('works');
+        startAutoScroll('products');
+    });
+
+    // Загрузка примеров работ
+    async function loadWorks() {
+        try {
+            const response = await fetch('/api/pictures/works?page=0&size=6&sort=id,desc');
+            const data = await response.json();
+
+            const worksCarousel = document.getElementById('works-carousel');
+            worksCarousel.innerHTML = '';
+
+            data.content.forEach(work => {
+                const workItem = document.createElement('div');
+                workItem.className = 'carousel-item';
+                workItem.innerHTML = `
+                    <div class="carousel-item-image">
+                        <img src="${work.url}" alt="${work.name}">
+                    </div>
+                    <div class="carousel-item-title">${work.name}</div>
+                    <div class="carousel-item-description">${work.description || ''}</div>
+                `;
+                worksCarousel.appendChild(workItem);
+            });
+        } catch (error) {
+            console.error('Ошибка загрузки примеров работ:', error);
+        }
+    }
+
+    // Загрузка товаров
+    async function loadProducts() {
+        try {
+            const response = await fetch('/api/product/short?page=0&size=6&sort=id,desc');
+            const data = await response.json();
+
+            const productsCarousel = document.getElementById('products-carousel');
+            productsCarousel.innerHTML = '';
+
+            data.content.forEach(product => {
+                const productItem = document.createElement('a');
+                productItem.className = 'carousel-item';
+                productItem.href = `/products/${product.slug}`;
+                productItem.innerHTML = `
+                    <div class="carousel-item-image">
+                        <img src="${product.mainPictureUrl || ''}" alt="${product.name}">
+                    </div>
+                    <div class="carousel-item-title">${product.name}</div>
+                    <div class="carousel-item-price">${product.price || ''}</div>
+                `;
+                productsCarousel.appendChild(productItem);
+            });
+        } catch (error) {
+            console.error('Ошибка загрузки товаров:', error);
+        }
+    }
+
+    function scrollCarousel(type, direction) {
+        const wrapper = document.getElementById(`${type}-carousel`);
+        const items = wrapper.children;
+
+        if (items.length === 0) return;
+
+        const itemWidth = items[0].offsetWidth + 20;
+
+        carousels[type].position += direction;
+
+        // Зацикливание
+        if (carousels[type].position < 0) {
+            carousels[type].position = Math.max(0, items.length - 3);
+        } else if (carousels[type].position > items.length - 3) {
+            carousels[type].position = 0;
+        }
+
+        wrapper.style.transform = `translateX(-${carousels[type].position * itemWidth}px)`;
+
+        // Сброс автопрокрутки
+        clearInterval(carousels[type].autoScroll);
+        startAutoScroll(type);
+    }
+
+    function startAutoScroll(type) {
+        const wrapper = document.getElementById(`${type}-carousel`);
+        if (wrapper.children.length === 0) return;
+
+        carousels[type].autoScroll = setInterval(() => {
+            scrollCarousel(type, 1);
+        }, 5000);
+    }
+
+    // Остановка автопрокрутки при наведении мыши
+    document.querySelectorAll('.carousel-container').forEach(container => {
+        container.addEventListener('mouseenter', function() {
+            const type = this.querySelector('.carousel-wrapper').id.replace('-carousel', '');
+            clearInterval(carousels[type].autoScroll);
+        });
+
+        container.addEventListener('mouseleave', function() {
+            const type = this.querySelector('.carousel-wrapper').id.replace('-carousel', '');
+            startAutoScroll(type);
+        });
+    });
+</script>
+</body>
+</html>

@@ -8,6 +8,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 @RequiredArgsConstructor
 public class HtmlController {
 
+    @GetMapping("/")
+    public String index() {
+        return "pages/home";
+    }
+
     @GetMapping("/404")
     public String handle404() {
         return "error/404";
