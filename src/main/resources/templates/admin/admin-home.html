@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Админ-панель - ИндТурПошив</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #2d5f4f 0%, #1a3d32 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        /* Общий контейнер */
+        .admin-container {
+            margin: 20px;
+            min-height: calc(100vh - 40px);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(135deg, #f5f5dc 0%, #e8e4d0 100%);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Шапка админки */
+        .admin-header {
+            background: rgba(180, 180, 180, 0.25);
+            padding: 20px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid rgba(150, 150, 150, 0.2);
+        }
+
+        .admin-header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .admin-logo {
+            width: 50px;
+            height: 50px;
+            object-fit: contain;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+        }
+
+        .admin-header h1 {
+            font-size: 2em;
+            color: #2d5f4f;
+            font-weight: normal;
+        }
+
+        .admin-nav-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .nav-button {
+            padding: 12px 25px;
+            background: rgba(150, 150, 150, 0.3);
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 1em;
+            color: #555;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+            font-family: 'Georgia', serif;
+        }
+
+        .nav-button:hover {
+            background: rgba(130, 130, 130, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Основной контент */
+        .admin-content {
+            padding: 50px;
+            flex: 1;
+        }
+
+        .admin-title {
+            font-size: 2.5em;
+            color: #2d5f4f;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        /* Сетка карточек */
+        .admin-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Карточка раздела */
+        .admin-card {
+            background: rgba(200, 200, 180, 0.3);
+            border-radius: 15px;
+            padding: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            min-height: 200px;
+        }
+
+        .admin-card:hover {
+            background: rgba(180, 180, 160, 0.4);
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .admin-card-icon {
+            font-size: 3em;
+            color: #2d5f4f;
+        }
+
+        .admin-card-title {
+            font-size: 1.8em;
+            color: #2d5f4f;
+            font-weight: 500;
+        }
+
+        .admin-card-description {
+            font-size: 1em;
+            color: #666;
+            line-height: 1.5;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .admin-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .admin-header-left {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .admin-header h1 {
+                font-size: 1.5em;
+            }
+
+            .admin-content {
+                padding: 30px 20px;
+            }
+
+            .admin-title {
+                font-size: 1.8em;
+            }
+
+            .admin-cards-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="admin-container">
+    <!-- Шапка админки -->
+    <div class="admin-header">
+        <div class="admin-header-left">
+            <img src="/images/logo.png" alt="Логотип" class="admin-logo">
+            <h1>Админ-панель</h1>
+        </div>
+        <div class="admin-nav-buttons">
+            <a href="/" class="nav-button">На сайт</a>
+            <a href="/admin" class="nav-button">Админка</a>
+        </div>
+    </div>
+
+    <!-- Основной контент -->
+    <div class="admin-content">
+        <h2 class="admin-title">Управление сайтом</h2>
+
+        <div class="admin-cards-grid">
+            <!-- Карточка: Категории -->
+            <a href="/admin/categories" class="admin-card">
+                <div class="admin-card-icon">📁</div>
+                <div class="admin-card-title">Категории</div>
+                <div class="admin-card-description">
+                    Создание, редактирование и удаление категорий товаров. Просмотр всех категорий.
+                </div>
+            </a>
+
+            <!-- Карточка: Продукты -->
+            <a href="/admin/products" class="admin-card">
+                <div class="admin-card-icon">🛍️</div>
+                <div class="admin-card-title">Продукты</div>
+                <div class="admin-card-description">
+                    Управление каталогом товаров: создание, редактирование цен, изменение статусов (доступность, удаление).
+                </div>
+            </a>
+
+            <!-- Карточка: Фотографии продуктов -->
+            <a href="/admin/product-pictures" class="admin-card">
+                <div class="admin-card-icon">🖼️</div>
+                <div class="admin-card-title">Фото продуктов</div>
+                <div class="admin-card-description">
+                    Добавление, удаление и изменение порядка отображения фотографий товаров.
+                </div>
+            </a>
+
+            <!-- Карточка: Примеры работ -->
+            <a href="/admin/works" class="admin-card">
+                <div class="admin-card-icon">✨</div>
+                <div class="admin-card-title">Примеры работ</div>
+                <div class="admin-card-description">
+                    Управление галереей примеров работ: добавление и удаление изображений с описаниями.
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

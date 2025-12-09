@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>403 - Доступ запрещен</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Анимированный фон с горой */
+        .animated-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 200%;
+            background-image: url('/images/gora.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: repeat-y;
+            animation: scrollBackground 60s linear infinite;
+            z-index: -1;
+        }
+
+        @keyframes scrollBackground {
+            0% {
+                transform: translateY(0);
+            }
+            100% {
+                transform: translateY(-50%);
+            }
+        }
+
+        /* Затемнение */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 0;
+        }
+
+        /* Контейнер ошибки */
+        .error-container {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+            text-align: center;
+        }
+
+        /* Логотип */
+        .error-logo {
+            width: 120px;
+            height: 120px;
+            object-fit: contain;
+            margin-bottom: 30px;
+            filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.5));
+            animation: fadeIn 1s ease;
+        }
+
+        /* Контент ошибки */
+        .error-content {
+            background: rgba(245, 245, 220, 0.95);
+            padding: 50px 60px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            animation: slideUp 0.8s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .error-code {
+            font-size: 8em;
+            color: #d9534f;
+            font-weight: bold;
+            margin-bottom: 20px;
+            line-height: 1;
+        }
+
+        .error-title {
+            font-size: 2em;
+            color: #d9534f;
+            margin-bottom: 15px;
+            font-weight: normal;
+        }
+
+        .error-message {
+            font-size: 1.2em;
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        /* Кнопки */
+        .error-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .error-button {
+            padding: 14px 30px;
+            background: linear-gradient(135deg, #2d5f4f 0%, #1a3d32 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-family: 'Georgia', serif;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .error-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(45, 95, 79, 0.4);
+        }
+
+        .error-button.secondary {
+            background: rgba(150, 150, 150, 0.3);
+            color: #555;
+        }
+
+        .error-button.secondary:hover {
+            background: rgba(130, 130, 130, 0.4);
+        }
+
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .error-logo {
+                width: 80px;
+                height: 80px;
+            }
+
+            .error-content {
+                padding: 40px 30px;
+            }
+
+            .error-code {
+                font-size: 5em;
+            }
+
+            .error-title {
+                font-size: 1.5em;
+            }
+
+            .error-message {
+                font-size: 1em;
+            }
+
+            .error-buttons {
+                flex-direction: column;
+            }
+
+            .error-button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- Анимированный фон с горой -->
+<div class="animated-background"></div>
+<div class="overlay"></div>
+
+<!-- Контейнер ошибки -->
+<div class="error-container">
+    <!-- Логотип -->
+    <img src="/images/logo.png" alt="Логотип" class="error-logo">
+
+    <!-- Контент ошибки -->
+    <div class="error-content">
+        <div class="error-code">403</div>
+        <h1 class="error-title">Доступ запрещен</h1>
+        <p class="error-message">
+            У вас нет прав для доступа к этой странице.
+            Если вы считаете, что это ошибка, обратитесь к администратору.
+        </p>
+        <div class="error-buttons">
+            <a href="/" class="error-button">На главную</a>
+            <a href="/login" class="error-button secondary">Войти</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

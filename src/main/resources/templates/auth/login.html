@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вход - ИндТурПошив</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Анимированный фон с горой */
+        .animated-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 200%;
+            background-image: url('/images/gora.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: repeat-y;
+            animation: scrollBackground 60s linear infinite;
+            z-index: -1;
+        }
+
+        @keyframes scrollBackground {
+            0% {
+                transform: translateY(0);
+            }
+            100% {
+                transform: translateY(-50%);
+            }
+        }
+
+        /* Затемнение для читаемости */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 0;
+        }
+
+        /* Контейнер формы входа */
+        .login-container {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* Логотип */
+        .login-logo {
+            width: 150px;
+            height: 150px;
+            object-fit: contain;
+            margin-bottom: 40px;
+            filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.5));
+            animation: fadeIn 1s ease;
+        }
+
+        /* Форма входа */
+        .login-form {
+            background: rgba(245, 245, 220, 0.95);
+            padding: 40px 50px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 400px;
+            animation: slideUp 0.8s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .login-form h2 {
+            text-align: center;
+            color: #2d5f4f;
+            font-size: 2em;
+            margin-bottom: 30px;
+            font-weight: normal;
+        }
+
+        /* Поля ввода */
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #2d5f4f;
+            font-size: 1.1em;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid rgba(45, 95, 79, 0.3);
+            border-radius: 10px;
+            font-size: 1em;
+            font-family: 'Georgia', serif;
+            background: rgba(255, 255, 255, 0.9);
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #2d5f4f;
+            background: rgba(255, 255, 255, 1);
+            box-shadow: 0 0 10px rgba(45, 95, 79, 0.2);
+        }
+
+        /* Кнопка входа */
+        .login-button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #2d5f4f 0%, #1a3d32 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-family: 'Georgia', serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .login-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(45, 95, 79, 0.4);
+        }
+
+        .login-button:active {
+            transform: translateY(0);
+        }
+
+        /* Уведомление об ошибке */
+        .error-notification {
+            background: rgba(220, 53, 69, 0.95);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+            animation: shake 0.5s ease;
+            text-align: center;
+            font-size: 1em;
+        }
+
+        .error-notification.show {
+            display: block;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        /* Ссылка на главную */
+        .back-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .back-link a {
+            color: #2d5f4f;
+            text-decoration: none;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+
+        .back-link a:hover {
+            color: #1a3d32;
+            text-decoration: underline;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .login-logo {
+                width: 100px;
+                height: 100px;
+                margin-bottom: 30px;
+            }
+
+            .login-form {
+                padding: 30px 25px;
+            }
+
+            .login-form h2 {
+                font-size: 1.6em;
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- Анимированный фон с горой -->
+<div class="animated-background"></div>
+<div class="overlay"></div>
+
+<!-- Контейнер формы входа -->
+<div class="login-container">
+    <!-- Логотип -->
+    <img src="/images/logo.png" alt="Логотип ИндТурПошив" class="login-logo">
+
+    <!-- Форма входа -->
+    <div class="login-form">
+        <h2>Вход в админ-панель</h2>
+
+        <!-- Уведомление об ошибке -->
+        <div id="errorNotification" class="error-notification">
+            <span id="errorMessage"></span>
+        </div>
+
+        <!-- Форма -->
+        <form id="loginForm" method="post" action="/login">
+            <div class="form-group">
+                <label for="username">Логин</label>
+                <input type="text" id="username" name="username" required autocomplete="username">
+            </div>
+
+            <div class="form-group">
+                <label for="password">Пароль</label>
+                <input type="password" id="password" name="password" required autocomplete="current-password">
+            </div>
+
+            <button type="submit" class="login-button">Войти</button>
+        </form>
+
+        <div class="back-link">
+            <a href="/">← Вернуться на главную</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Проверка наличия параметра error в URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const hasError = urlParams.get('error');
+
+    if (hasError === 'true') {
+        const errorNotification = document.getElementById('errorNotification');
+        const errorMessage = document.getElementById('errorMessage');
+
+        errorMessage.textContent = 'Неверный логин или пароль';
+        errorNotification.classList.add('show');
+
+        // Автоматически скрыть уведомление через 5 секунд
+        setTimeout(() => {
+            errorNotification.classList.remove('show');
+        }, 5000);
+    }
+
+    // Обработка отправки формы
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+        const username = document.getElementById('username').value.trim();
+        const password = document.getElementById('password').value.trim();
+
+        if (!username || !password) {
+            e.preventDefault();
+            const errorNotification = document.getElementById('errorNotification');
+            const errorMessage = document.getElementById('errorMessage');
+
+            errorMessage.textContent = 'Пожалуйста, заполните все поля';
+            errorNotification.classList.add('show');
+
+            setTimeout(() => {
+                errorNotification.classList.remove('show');
+            }, 3000);
+        }
+    });
+</script>
+</body>
+</html>

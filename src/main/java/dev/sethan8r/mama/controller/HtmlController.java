@@ -13,8 +13,23 @@ public class HtmlController {
         return "pages/home";
     }
 
+    @GetMapping("/login")
+    public String login() {
+        return "auth/login";
+    }
+
+    @GetMapping("/admin")
+    public String adminHome() {
+        return "admin/admin-home";
+    }
+
     @GetMapping("/404")
     public String handle404() {
         return "error/404";
+    }
+
+    @GetMapping("/403")
+    public String handle403() {
+        return "error/403";
     }
 }
