@@ -799,7 +799,7 @@
                 <div class="form-group">
                     <label>Выберите фотографии</label>
                     <div class="file-input-wrapper">
-                        <input type="file" id="multipleFiles" accept="image/*" multiple required>
+                        <input type="file" id="multipleFiles" accept="image/*" multiple>
                         <label for="multipleFiles" class="file-input-label">
                             📁 Выберите несколько изображений
                         </label>
@@ -990,12 +990,28 @@
     // Обработка выбора нескольких файлов
     document.getElementById('multipleFiles').addEventListener('change', function(e) {
         const files = Array.from(e.target.files);
-        multipleFilesData = files;
 
+        // Если ничего не выбрано, игнорируем
+        if (files.length === 0) {
+            return;
+        }
+
+        // ДОБАВЛЯЕМ новые файлы к существующим
+        multipleFilesData = [...multipleFilesData, ...files];
+
+        // Очищаем input чтобы можно было выбрать те же файлы снова
+        e.target.value = '';
+
+        // Обновляем отображение
+        updateMultipleFilesDisplay();
+    });
+
+    // Функция обновления отображения файлов
+    function updateMultipleFilesDisplay() {
         const container = document.getElementById('multipleFilesContainer');
         container.innerHTML = '';
 
-        files.forEach((file, index) => {
+        multipleFilesData.forEach((file, index) => {
             const fileItem = document.createElement('div');
             fileItem.className = 'file-item';
             fileItem.innerHTML = `
@@ -1008,34 +1024,12 @@
             `;
             container.appendChild(fileItem);
         });
-    });
+    }
 
     // Удаление файла из списка
     function removeFile(index) {
         multipleFilesData.splice(index, 1);
-
-        // Пересоздаем список
-        const event = { target: { files: multipleFilesData } };
-        const container = document.getElementById('multipleFilesContainer');
-        container.innerHTML = '';
-
-        multipleFilesData.forEach((file, idx) => {
-            const fileItem = document.createElement('div');
-            fileItem.className = 'file-item';
-            fileItem.innerHTML = `
-                <div class="file-item-name">${file.name}</div>
-                <div class="file-item-order">
-                    <input type="number" min="0" value="${idx}"
-                           data-index="${idx}" class="sortorder-input">
-                </div>
-                <button type="button" class="remove-file-button" onclick="removeFile(${idx})">✕</button>
-            `;
-            container.appendChild(fileItem);
-        });
-
-        if (multipleFilesData.length === 0) {
-            document.getElementById('multipleFiles').value = '';
-        }
+        updateMultipleFilesDisplay();
     }
 
     // Загрузка одной фотографии
@@ -1112,9 +1106,15 @@
             formData.append('files', file);
         });
 
-        // Добавляем sortOrders как JSON
-        const sortOrdersBlob = new Blob([JSON.stringify(sortOrders)], { type: 'application/json' });
-        formData.append('sortOrders', sortOrdersBlob);
+        // Добавляем sortOrders как JSON Blob с правильным типом
+        const sortOrdersBlob = new Blob(
+            [JSON.stringify(sortOrders)],
+            { type: 'application/json' }
+        );
+        formData.append('sortOrders', sortOrdersBlob, 'sortOrders');
+
+        console.log('Отправка файлов:', multipleFilesData.length);
+        console.log('sortOrders:', sortOrders);
 
         try {
             const response = await fetch(`/api/pictures/product/admin/slug/${selectedProductId}/more`, {
@@ -1124,18 +1124,20 @@
 
             if (!response.ok) {
                 const errorData = await response.json();
+                console.error('Ошибка от сервера (multiple):', errorData);
                 showNotification('Ошибка', errorData.message || 'Не удалось загрузить фотографии', 'error');
                 return;
             }
 
             const result = await response.json();
+            console.log('Результат загрузки:', result);
             showNotification('Успех',
                 `Загружено ${result.uploaded} из ${result.total} фотографий`, 'success');
 
             // Очистка формы
             document.getElementById('multipleFiles').value = '';
-            document.getElementById('multipleFilesContainer').innerHTML = '';
             multipleFilesData = [];
+            updateMultipleFilesDisplay();
 
             // Перезагрузка фотографий
             await loadProductPhotos();

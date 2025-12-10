@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Товар - ИндТурПошив</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #2d5f4f 0%, #1a3d32 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        /* Общий контейнер */
+        .main-container {
+            margin: 20px;
+            min-height: calc(100vh - 40px);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(135deg, #f5f5dc 0%, #e8e4d0 100%);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Шапка */
+        .header {
+            background: rgba(180, 180, 180, 0.25);
+            padding: 20px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid rgba(150, 150, 150, 0.2);
+            min-height: 90px;
+            max-height: 90px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            cursor: pointer;
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+        }
+
+        .header h1 {
+            font-size: 2em;
+            color: #2d5f4f;
+            font-weight: normal;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .nav-button {
+            padding: 12px 25px;
+            background: rgba(150, 150, 150, 0.3);
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 1em;
+            color: #555;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+            font-family: 'Georgia', serif;
+        }
+
+        .nav-button:hover {
+            background: rgba(130, 130, 130, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Основной контент */
+        .content {
+            padding: 50px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        /* Контейнер продукта */
+        .product-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Верхняя часть - фото и основная информация */
+        .product-main {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            margin-bottom: 50px;
+        }
+
+        /* Галерея фотографий */
+        .product-gallery {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .main-image-container {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            background: rgba(220, 220, 200, 0.5);
+            border-radius: 15px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .main-image-container:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .main-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .thumbnails {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 10px;
+        }
+
+        .thumbnail {
+            aspect-ratio: 16 / 9;
+            background: rgba(220, 220, 200, 0.5);
+            border-radius: 10px;
+            overflow: hidden;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .thumbnail:hover {
+            border-color: #2d5f4f;
+            transform: scale(1.05);
+        }
+
+        .thumbnail.active {
+            border-color: #2d5f4f;
+        }
+
+        .thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Информация о продукте */
+        .product-info {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .product-title {
+            font-size: 2.5em;
+            color: #2d5f4f;
+            font-weight: normal;
+            line-height: 1.2;
+        }
+
+        .product-price-block {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .product-price {
+            font-size: 2em;
+            color: #1a3d32;
+            font-weight: 500;
+        }
+
+        .availability-badge {
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+
+        .availability-badge.unavailable {
+            background: rgba(220, 53, 69, 0.2);
+            color: #dc3545;
+        }
+
+        .product-category {
+            font-size: 1.1em;
+            color: #666;
+        }
+
+        .product-category span {
+            color: #2d5f4f;
+            font-weight: 500;
+        }
+
+        .product-description {
+            font-size: 1.1em;
+            color: #333;
+            line-height: 1.8;
+            padding: 20px;
+            background: rgba(200, 200, 180, 0.3);
+            border-radius: 15px;
+        }
+
+        /* Характеристики */
+        .characteristics-section {
+            background: rgba(200, 200, 180, 0.3);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 40px;
+        }
+
+        .characteristics-section h3 {
+            font-size: 1.8em;
+            color: #2d5f4f;
+            margin-bottom: 20px;
+            font-weight: normal;
+        }
+
+        .characteristics-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .characteristic-item {
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            gap: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 10px;
+        }
+
+        .characteristic-label {
+            color: #2d5f4f;
+            font-weight: 500;
+            font-size: 1.1em;
+        }
+
+        .characteristic-value {
+            color: #333;
+            font-size: 1em;
+        }
+
+        .no-characteristics {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            padding: 20px;
+        }
+
+        /* Плашка для заказа */
+        .order-banner {
+            background: linear-gradient(135deg, #2d5f4f 0%, #1a3d32 100%);
+            color: white;
+            padding: 30px 40px;
+            border-radius: 15px;
+            text-align: center;
+            font-size: 1.2em;
+            line-height: 1.6;
+            margin-bottom: 40px;
+        }
+
+        .order-banner a {
+            color: #f5f5dc;
+            text-decoration: underline;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .order-banner a:hover {
+            color: white;
+        }
+
+        /* Загрузка */
+        .loading {
+            text-align: center;
+            padding: 100px 20px;
+            font-size: 1.5em;
+            color: #2d5f4f;
+        }
+
+        /* Ошибка */
+        .error-message {
+            text-align: center;
+            padding: 60px 20px;
+            color: #dc3545;
+            font-size: 1.2em;
+        }
+
+        /* Модальное окно для просмотра фото */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            padding: 20px;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal-image-container {
+            position: relative;
+            max-width: 90vw;
+            max-height: 90vh;
+            animation: zoomIn 0.3s ease;
+        }
+
+        @keyframes zoomIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .modal-image {
+            max-width: 100%;
+            max-height: 90vh;
+            border-radius: 10px;
+            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: -40px;
+            right: 0;
+            background: rgba(220, 53, 69, 0.9);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 1.5em;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .modal-close:hover {
+            background: rgba(220, 53, 69, 1);
+            transform: scale(1.1);
+        }
+
+        /* Контейнер уведомлений */
+        .notifications-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-width: 400px;
+        }
+
+        .notification {
+            background: rgba(220, 53, 69, 0.95);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            animation: slideInRight 0.3s ease;
+            cursor: pointer;
+        }
+
+        .notification.success {
+            background: rgba(40, 167, 69, 0.95);
+        }
+
+        .notification.info {
+            background: rgba(23, 162, 184, 0.95);
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .notification-icon {
+            font-size: 1.5em;
+        }
+
+        .notification-content {
+            flex: 1;
+        }
+
+        .notification-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .notification-message {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .notification-close {
+            font-size: 1.2em;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+
+        .notification-close:hover {
+            opacity: 1;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 1200px) {
+            .product-main {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+                min-height: auto;
+                max-height: none;
+                padding: 20px 25px;
+            }
+
+            .header-left {
+                width: 100%;
+            }
+
+            .header h1 {
+                font-size: 1.5em;
+            }
+
+            .nav-buttons {
+                flex-wrap: wrap;
+                width: 100%;
+            }
+
+            .nav-button {
+                flex: 1;
+                min-width: 120px;
+                text-align: center;
+            }
+
+            .content {
+                padding: 30px 20px;
+            }
+
+            .product-title {
+                font-size: 1.8em;
+            }
+
+            .product-price {
+                font-size: 1.5em;
+            }
+
+            .characteristic-item {
+                grid-template-columns: 1fr;
+                gap: 5px;
+            }
+
+            .thumbnails {
+                grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="main-container">
+    <!-- Шапка -->
+    <div class="header">
+        <div class="header-left" onclick="window.location.href='/'">
+            <img src="/images/logo.png" alt="Логотип" class="logo">
+            <h1>ИндТурПошив</h1>
+        </div>
+        <div class="nav-buttons">
+            <a href="/works" class="nav-button">Примеры работ</a>
+            <a href="/products" class="nav-button">Каталог</a>
+            <a href="/contacts" class="nav-button">Контакты</a>
+        </div>
+    </div>
+
+    <!-- Основной контент -->
+    <div class="content">
+        <!-- Загрузка -->
+        <div id="loadingContainer" class="loading">
+            Загрузка товара...
+        </div>
+
+        <!-- Контейнер продукта -->
+        <div id="productContainer" class="product-container" style="display: none;">
+            <!-- Верхняя часть -->
+            <div class="product-main">
+                <!-- Галерея фотографий -->
+                <div class="product-gallery">
+                    <div class="main-image-container" onclick="openImageModal()">
+                        <img id="mainImage" class="main-image" src="" alt="Фото товара">
+                    </div>
+                    <div id="thumbnailsContainer" class="thumbnails">
+                        <!-- Миниатюры будут загружены через JS -->
+                    </div>
+                </div>
+
+                <!-- Информация о продукте -->
+                <div class="product-info">
+                    <h1 class="product-title" id="productTitle">Название товара</h1>
+
+                    <div class="product-price-block">
+                        <div class="product-price" id="productPrice">-</div>
+                        <div id="availabilityBadge"></div>
+                    </div>
+
+                    <div class="product-category">
+                        Категория: <span id="productCategory">-</span>
+                    </div>
+
+                    <div class="product-description" id="productDescription">
+                        Описание товара
+                    </div>
+                </div>
+            </div>
+
+            <!-- Плашка для заказа -->
+            <div class="order-banner">
+                Для заказа напишите нам, наши контакты вы можете найти на странице
+                <a href="/contacts">"КОНТАКТЫ"</a>
+            </div>
+
+            <!-- Характеристики -->
+            <div class="characteristics-section">
+                <h3>Характеристики</h3>
+                <div id="characteristicsContainer">
+                    <!-- Характеристики будут загружены через JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Ошибка -->
+        <div id="errorContainer" class="error-message" style="display: none;">
+            <p id="errorMessage"></p>
+            <a href="/" class="nav-button" style="margin-top: 20px; display: inline-block;">
+                На главную
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно для просмотра фото -->
+<div class="modal-overlay" id="imageModal">
+    <div class="modal-image-container">
+        <button class="modal-close" onclick="closeImageModal()">✕</button>
+        <img id="modalImage" class="modal-image" src="" alt="Просмотр">
+    </div>
+</div>
+
+<!-- Контейнер для уведомлений -->
+<div class="notifications-container" id="notificationsContainer"></div>
+
+<script>
+    let productData = null;
+    let currentImageIndex = 0;
+
+    // Функция показа уведомлений
+    function showNotification(title, message, type = 'error') {
+        const container = document.getElementById('notificationsContainer');
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+
+        const icon = type === 'error' ? '⚠️' : type === 'success' ? '✅' : 'ℹ️';
+
+        notification.innerHTML = `
+            <div class="notification-icon">${icon}</div>
+            <div class="notification-content">
+                <div class="notification-title">${title}</div>
+                <div class="notification-message">${message}</div>
+            </div>
+            <div class="notification-close" onclick="this.parentElement.remove()">✕</div>
+        `;
+
+        container.appendChild(notification);
+
+        setTimeout(() => {
+            notification.remove();
+        }, 5000);
+
+        notification.addEventListener('click', () => {
+            notification.remove();
+        });
+    }
+
+    // Получение slug из URL
+    function getSlugFromUrl() {
+        const pathParts = window.location.pathname.split('/');
+        return pathParts[pathParts.length - 1];
+    }
+
+    // Загрузка продукта
+    async function loadProduct() {
+        const slug = getSlugFromUrl();
+
+        if (!slug || slug === 'products') {
+            showError('Неверная ссылка на товар');
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/product/${slug}`);
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                showError(errorData.message || 'Товар не найден');
+                return;
+            }
+
+            productData = await response.json();
+            displayProduct(productData);
+        } catch (error) {
+            console.error('Ошибка загрузки товара:', error);
+            showError('Не удалось загрузить товар');
+        }
+    }
+
+    // Отображение ошибки
+    function showError(message) {
+        document.getElementById('loadingContainer').style.display = 'none';
+        document.getElementById('productContainer').style.display = 'none';
+        document.getElementById('errorContainer').style.display = 'block';
+        document.getElementById('errorMessage').textContent = message;
+    }
+
+    // Отображение продукта
+    function displayProduct(product) {
+        // Скрываем загрузку, показываем продукт
+        document.getElementById('loadingContainer').style.display = 'none';
+        document.getElementById('productContainer').style.display = 'block';
+
+        // Заголовок страницы
+        document.title = `${product.name} - ИндТурПошив`;
+
+        // Название
+        document.getElementById('productTitle').textContent = product.name;
+
+        // Цена
+        const priceEl = document.getElementById('productPrice');
+        if (product.price) {
+            priceEl.textContent = product.price;
+        } else {
+            priceEl.textContent = 'Цена не указана';
+            priceEl.style.color = '#999';
+        }
+
+        // Доступность
+        const badgeEl = document.getElementById('availabilityBadge');
+        if (!product.available) {
+            badgeEl.innerHTML = '<span class="availability-badge unavailable">Временно недоступно для заказа</span>';
+        }
+
+        // Категория
+        document.getElementById('productCategory').textContent = product.categoryName;
+
+        // Описание
+        document.getElementById('productDescription').textContent = product.description;
+
+        // Фотографии
+        displayPhotos(product.pictures);
+
+        // Характеристики
+        displayCharacteristics(product.characteristics);
+    }
+
+    // Отображение фотографий
+    function displayPhotos(pictures) {
+        if (!pictures || pictures.length === 0) {
+            document.getElementById('mainImage').src = '/images/logo.png';
+            document.getElementById('thumbnailsContainer').innerHTML =
+                '<div style="grid-column: 1/-1; text-align: center; color: #999;">Фотографии отсутствуют</div>';
+            return;
+        }
+
+        // Главное фото
+        document.getElementById('mainImage').src = pictures[0].url;
+        currentImageIndex = 0;
+
+        // Миниатюры
+        const container = document.getElementById('thumbnailsContainer');
+        container.innerHTML = '';
+
+        pictures.forEach((photo, index) => {
+            const thumbnail = document.createElement('div');
+            thumbnail.className = `thumbnail ${index === 0 ? 'active' : ''}`;
+            thumbnail.onclick = () => changeMainImage(index);
+            thumbnail.innerHTML = `<img src="${photo.url}" alt="Фото ${index + 1}">`;
+            container.appendChild(thumbnail);
+        });
+    }
+
+    // Смена главного изображения
+    function changeMainImage(index) {
+        if (!productData || !productData.pictures || !productData.pictures[index]) return;
+
+        currentImageIndex = index;
+        document.getElementById('mainImage').src = productData.pictures[index].url;
+
+        // Обновляем активную миниатюру
+        document.querySelectorAll('.thumbnail').forEach((thumb, i) => {
+            thumb.classList.toggle('active', i === index);
+        });
+    }
+
+    // Отображение характеристик
+    function displayCharacteristics(characteristics) {
+        const container = document.getElementById('characteristicsContainer');
+
+        if (!characteristics || Object.keys(characteristics).length === 0) {
+            container.innerHTML = '<div class="no-characteristics">Характеристики не указаны</div>';
+            return;
+        }
+
+        const list = document.createElement('div');
+        list.className = 'characteristics-list';
+
+        Object.entries(characteristics).forEach(([key, value]) => {
+            const item = document.createElement('div');
+            item.className = 'characteristic-item';
+            item.innerHTML = `
+                <div class="characteristic-label">${key}:</div>
+                <div class="characteristic-value">${value}</div>
+            `;
+            list.appendChild(item);
+        });
+
+        container.innerHTML = '';
+        container.appendChild(list);
+    }
+
+    // Открытие модального окна с изображением
+    function openImageModal() {
+        if (!productData || !productData.pictures || productData.pictures.length === 0) return;
+
+        document.getElementById('modalImage').src = productData.pictures[currentImageIndex].url;
+        document.getElementById('imageModal').classList.add('show');
+    }
+
+    // Закрытие модального окна
+    function closeImageModal() {
+        document.getElementById('imageModal').classList.remove('show');
+    }
+
+    // Закрытие модального окна при клике вне изображения
+    document.getElementById('imageModal').addEventListener('click', (e) => {
+        if (e.target.id === 'imageModal') {
+            closeImageModal();
+        }
+    });
+
+    // Закрытие модального окна по ESC
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            closeImageModal();
+        }
+    });
+
+    // Загрузка продукта при загрузке страницы
+    document.addEventListener('DOMContentLoaded', loadProduct);
+</script>
+</body>
+</html>

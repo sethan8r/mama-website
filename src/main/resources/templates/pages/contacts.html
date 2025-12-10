@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Контакты - ИндТурПошив</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #2d5f4f 0%, #1a3d32 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        /* Общий контейнер */
+        .main-container {
+            margin: 20px;
+            min-height: calc(100vh - 40px);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(135deg, #f5f5dc 0%, #e8e4d0 100%);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Шапка */
+        .header {
+            background: rgba(180, 180, 180, 0.25);
+            padding: 20px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid rgba(150, 150, 150, 0.2);
+            min-height: 90px;
+            max-height: 90px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            cursor: pointer;
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+        }
+
+        .header h1 {
+            font-size: 2em;
+            color: #2d5f4f;
+            font-weight: normal;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .nav-button {
+            padding: 12px 25px;
+            background: rgba(150, 150, 150, 0.3);
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 1em;
+            color: #555;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+            font-family: 'Georgia', serif;
+        }
+
+        .nav-button:hover {
+            background: rgba(130, 130, 130, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Основной контент */
+        .content {
+            padding: 50px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .page-title {
+            font-size: 2.5em;
+            color: #2d5f4f;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .page-subtitle {
+            font-size: 1.3em;
+            color: #666;
+            text-align: center;
+            margin-bottom: 50px;
+            line-height: 1.6;
+        }
+
+        /* Контейнер контактов */
+        .contacts-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Сетка контактов */
+        .contacts-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 50px;
+        }
+
+        /* Контактная секция */
+        .contact-section {
+            background: rgba(200, 200, 180, 0.3);
+            border-radius: 15px;
+            padding: 30px;
+        }
+
+        .contact-section h3 {
+            font-size: 1.8em;
+            color: #2d5f4f;
+            margin-bottom: 25px;
+            font-weight: normal;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .contact-icon {
+            font-size: 1.2em;
+        }
+
+        .contact-item {
+            margin-bottom: 20px;
+        }
+
+        .contact-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .contact-label {
+            display: block;
+            color: #2d5f4f;
+            font-weight: 500;
+            font-size: 1.1em;
+            margin-bottom: 8px;
+        }
+
+        .contact-value {
+            font-size: 1.2em;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .contact-value a {
+            color: #2d5f4f;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .contact-value a:hover {
+            color: #1a3d32;
+            text-decoration: underline;
+        }
+
+        .placeholder-text {
+            color: #999;
+            font-style: italic;
+        }
+
+        /* Секция с картой */
+        .map-section {
+            background: rgba(200, 200, 180, 0.3);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 40px;
+        }
+
+        .map-section h3 {
+            font-size: 1.8em;
+            color: #2d5f4f;
+            margin-bottom: 25px;
+            font-weight: normal;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .map-container {
+            width: 100%;
+            height: 400px;
+            background: rgba(220, 220, 200, 0.5);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-size: 1.2em;
+            border: 2px dashed rgba(45, 95, 79, 0.3);
+        }
+
+        .map-placeholder {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .map-placeholder-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+
+        /* Секция "О компании" на всю ширину */
+        .about-section {
+            background: rgba(200, 200, 180, 0.3);
+            border-radius: 15px;
+            padding: 40px;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .about-section h2 {
+            font-size: 2em;
+            color: #2d5f4f;
+            margin-bottom: 20px;
+            font-weight: normal;
+        }
+
+        .about-section p {
+            font-size: 1.2em;
+            color: #333;
+            line-height: 1.8;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* Рабочие часы */
+        .hours-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .hours-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 8px;
+        }
+
+        .hours-day {
+            color: #2d5f4f;
+            font-weight: 500;
+        }
+
+        .hours-time {
+            color: #333;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+                min-height: auto;
+                max-height: none;
+                padding: 20px 25px;
+            }
+
+            .header-left {
+                width: 100%;
+            }
+
+            .header h1 {
+                font-size: 1.5em;
+            }
+
+            .nav-buttons {
+                flex-wrap: wrap;
+                width: 100%;
+            }
+
+            .nav-button {
+                flex: 1;
+                min-width: 120px;
+                text-align: center;
+            }
+
+            .content {
+                padding: 30px 20px;
+            }
+
+            .page-title {
+                font-size: 1.8em;
+            }
+
+            .page-subtitle {
+                font-size: 1.1em;
+            }
+
+            .contacts-grid {
+                grid-template-columns: 1fr;
+                gap: 25px;
+            }
+
+            .map-container {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="main-container">
+    <!-- Шапка -->
+    <div class="header">
+        <div class="header-left" onclick="window.location.href='/'">
+            <img src="/images/logo.png" alt="Логотип" class="logo">
+            <h1>ИндТурПошив</h1>
+        </div>
+        <div class="nav-buttons">
+            <a href="/works" class="nav-button">Примеры работ</a>
+            <a href="/products" class="nav-button">Каталог</a>
+            <a href="/contacts" class="nav-button">Контакты</a>
+        </div>
+    </div>
+
+    <!-- Основной контент -->
+    <div class="content">
+        <h1 class="page-title">Контакты</h1>
+        <p class="page-subtitle">
+            Свяжитесь с нами любым удобным способом
+        </p>
+
+        <div class="contacts-container">
+            <!-- Секция "О компании" -->
+            <div class="about-section">
+                <h2>ИндТурПошив</h2>
+                <p>
+                    Мы занимаемся пошивом качественной защитной экипировки для туристов,
+                    походников и путешественников. Также выполняем индивидуальные заказы
+                    в швейном деле: от ремонта одежды до создания уникальных изделий по вашим эскизам.
+                </p>
+            </div>
+
+            <!-- Сетка контактов -->
+            <div class="contacts-grid">
+                <!-- Телефон -->
+                <div class="contact-section">
+                    <h3>
+                        <span class="contact-icon">📞</span>
+                        Телефон
+                    </h3>
+                    <div class="contact-item">
+                        <span class="contact-label">Для связи:</span>
+                        <div class="contact-value">
+                            <a href="tel:+79991234567" class="placeholder-text">+7 (999) 123-45-67</a>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <span class="contact-label">Звонки принимаются:</span>
+                        <div class="contact-value placeholder-text">
+                            Пн-Пт: 9:00 - 18:00<br>
+                            Сб-Вс: выходной
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Email / Мессенджеры -->
+                <div class="contact-section">
+                    <h3>
+                        <span class="contact-icon">✉️</span>
+                        Онлайн
+                    </h3>
+                    <div class="contact-item">
+                        <span class="contact-label">Email:</span>
+                        <div class="contact-value">
+                            <a href="mailto:info@indturposhiv.ru" class="placeholder-text">info@indturposhiv.ru</a>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <span class="contact-label">WhatsApp:</span>
+                        <div class="contact-value">
+                            <a href="https://wa.me/79991234567" class="placeholder-text">+7 (999) 123-45-67</a>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <span class="contact-label">Telegram:</span>
+                        <div class="contact-value">
+                            <a href="https://t.me/indturposhiv" class="placeholder-text">@indturposhiv</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Адрес -->
+                <div class="contact-section">
+                    <h3>
+                        <span class="contact-icon">📍</span>
+                        Адрес
+                    </h3>
+                    <div class="contact-item">
+                        <span class="contact-label">Мастерская:</span>
+                        <div class="contact-value placeholder-text">
+                            г. Москва, ул. Примерная, д. 10, оф. 5
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <span class="contact-label">Метро:</span>
+                        <div class="contact-value placeholder-text">
+                            Маяковская (5 минут пешком)
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Режим работы -->
+                <div class="contact-section">
+                    <h3>
+                        <span class="contact-icon">🕐</span>
+                        Режим работы
+                    </h3>
+                    <div class="hours-list">
+                        <div class="hours-item">
+                            <span class="hours-day">Понедельник</span>
+                            <span class="hours-time placeholder-text">9:00 - 18:00</span>
+                        </div>
+                        <div class="hours-item">
+                            <span class="hours-day">Вторник</span>
+                            <span class="hours-time placeholder-text">9:00 - 18:00</span>
+                        </div>
+                        <div class="hours-item">
+                            <span class="hours-day">Среда</span>
+                            <span class="hours-time placeholder-text">9:00 - 18:00</span>
+                        </div>
+                        <div class="hours-item">
+                            <span class="hours-day">Четверг</span>
+                            <span class="hours-time placeholder-text">9:00 - 18:00</span>
+                        </div>
+                        <div class="hours-item">
+                            <span class="hours-day">Пятница</span>
+                            <span class="hours-time placeholder-text">9:00 - 18:00</span>
+                        </div>
+                        <div class="hours-item">
+                            <span class="hours-day">Суббота</span>
+                            <span class="hours-time placeholder-text">Выходной</span>
+                        </div>
+                        <div class="hours-item">
+                            <span class="hours-day">Воскресенье</span>
+                            <span class="hours-time placeholder-text">Выходной</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Карта -->
+            <div class="map-section">
+                <h3>
+                    <span class="contact-icon">🗺️</span>
+                    Как добраться
+                </h3>
+                <div class="map-container">
+                    <div class="map-placeholder">
+                        <div class="map-placeholder-icon">📍</div>
+                        <div>Здесь будет интерактивная карта</div>
+                        <div style="font-size: 0.9em; margin-top: 10px; color: #999;">
+                            (Яндекс.Карты или Google Maps)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

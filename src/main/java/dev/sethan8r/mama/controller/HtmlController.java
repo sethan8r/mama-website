@@ -20,6 +20,16 @@ public class HtmlController {
         return "auth/login";
     }
 
+    @GetMapping("/products/{slug}")
+    public String productView() {
+        return "pages/product-view";
+    }
+
+    @GetMapping("/contacts")
+    public String contacts() {
+        return "pages/contacts";
+    }
+
     @GetMapping("/admin")
     public String adminHome() {
         return "admin/admin-home";
