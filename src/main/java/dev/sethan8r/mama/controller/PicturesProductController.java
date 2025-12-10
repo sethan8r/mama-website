@@ -68,7 +68,7 @@ public class PicturesProductController {
         return picturesProductService.getPicturesProductByProductIdForAdmin(productId);
     }
 
-    @GetMapping("/admin/{slug}")
+    @GetMapping("/admin/slug/{slug}")
     public List<PicturesProductResponseAdminDto> getPicturesProductByProductSlugForAdmin(@PathVariable String slug) {
         return picturesProductService.getPicturesProductByProductSlugForAdmin(slug);
     }
