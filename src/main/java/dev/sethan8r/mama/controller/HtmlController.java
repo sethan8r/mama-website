@@ -45,6 +45,11 @@ public class HtmlController {
         return "admin/admin-product-edit";
     }
 
+    @GetMapping("/admin/product-pictures")
+    public String adminProductPictures() {
+        return "admin/admin-product-pictures";
+    }
+
     @GetMapping("/404")
     public String handle404() {
         return "error/404";

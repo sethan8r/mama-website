@@ -76,6 +76,52 @@ public class PicturesProductService {
     }
 
     @Transactional
+    public UploadPicturesResponseDto createPicturesProductBySlugMany(String slug, Integer[] sortOrders,
+                                                               MultipartFile[] files) {
+        log.info("Добавление множества картинок для продукта по slug={} с очередностями {}",  slug, sortOrders);
+
+        if(files.length != sortOrders.length) {
+            throw new InvalidRequestException("Количество файлов (" + files.length
+                    + ") не совпадает с количеством порядковых номеров (" + sortOrders.length + ")");
+        }
+
+        Product product = productRepository.findBySlug(slug).orElseThrow(
+                () -> new NotFoundException("Продукт со slug \"" + slug + "\" не найден"));
+
+        List<PicturesProduct> picturesProductsList = new ArrayList<>();
+
+        int ok = 0;
+        int length = files.length;
+
+        for (int i = 0; i < files.length; i++) {
+            MultipartFile file = files[i];
+
+            if (file.isEmpty()) {
+                log.warn("Файл {} пустой — пропускаю", i);
+                continue;
+            }
+
+            try {
+                PicturesProduct pic = new PicturesProduct();
+                pic.setProduct(product);
+                pic.setSortOrder(sortOrders[i]);
+                pic.setImage(file.getBytes());
+
+                picturesProductsList.add(pic);
+                ok++;
+
+            } catch (IOException ex) {
+                log.error("Ошибка чтения файла {}", file.getOriginalFilename(), ex);
+                throw new InvalidRequestException("Не удалось прочитать файл изображения");
+            }
+        }
+
+        picturesProductRepository.saveAll(picturesProductsList);
+
+        return new UploadPicturesResponseDto(ok, length);
+    }
+
+    @Transactional
     public void createPicturesProduct(Long productId, Integer sortOrders, MultipartFile file) {
         log.info("Добавление одно картинки для продукта с id={} и очередность {}",   productId, sortOrders);
 
@@ -85,6 +131,30 @@ public class PicturesProductService {
 
         Product product = productRepository.findById(productId).orElseThrow(
                 () -> new NotFoundException("Продукт с id \"" + productId + "\" не найден"));
+
+        PicturesProduct pic = new PicturesProduct();
+        try {
+            pic.setProduct(product);
+            pic.setSortOrder(sortOrders);
+            pic.setImage(file.getBytes());
+        } catch (IOException ex) {
+            log.error("Ошибка чтения файла {}", file.getOriginalFilename(), ex);
+            throw new InvalidRequestException("Не удалось прочитать файл изображения");
+        }
+
+        picturesProductRepository.save(pic);
+    }
+
+    @Transactional
+    public void createPicturesProductBySlug(String slug, Integer sortOrders, MultipartFile file) {
+        log.info("Добавление одно картинки для продукта со slug={} и очередность {}",   slug, sortOrders);
+
+        if (file.isEmpty()) {
+            throw new InvalidRequestException("Передан пустой файл");
+        }
+
+        Product product = productRepository.findBySlug(slug).orElseThrow(
+                () -> new NotFoundException("Продукт с id \"" + slug + "\" не найден"));
 
         PicturesProduct pic = new PicturesProduct();
         try {
