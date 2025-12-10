@@ -190,6 +190,16 @@ public class PicturesProductService {
                 .collect(Collectors.toList());
     }
 
+    public List<PicturesProductResponseAdminDto> getPicturesProductByProductSlugForAdmin(String slug) {
+        log.info("Поиск всех картинок админом для продукта со slug={}",  slug);
+
+        List<PicturesProduct> list = picturesProductRepository.findAllByProductSlugOrderBySortOrderAsc(slug);
+
+        return list.stream()
+                .map(picturesProductMapper::toPicturesProductResponseAdminDto)
+                .collect(Collectors.toList());
+    }
+
     @Transactional
     public void deletePicturesProductById(Long pictureId) {
         log.info("Удаление картинки с id={}", pictureId);

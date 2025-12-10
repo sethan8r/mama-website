@@ -924,11 +924,11 @@
         products.forEach(product => {
             const card = document.createElement('div');
             card.className = 'product-card';
-            card.onclick = () => selectProduct(product.id, product.name, card);
+            card.onclick = () => selectProduct(product.slug, product.name, card);
 
             card.innerHTML = `
                 <div class="product-card-name">${product.name}</div>
-                <div class="product-card-id">ID: ${product.id}</div>
+                <div class="product-card-id">Slug: ${product.slug}</div>
             `;
 
             grid.appendChild(card);
@@ -939,7 +939,7 @@
     }
 
     // Выбор продукта
-    function selectProduct(productId, productName, cardElement) {
+    function selectProduct(productSlug, productName, cardElement) {
         // Снимаем выделение со всех карточек
         document.querySelectorAll('.product-card').forEach(card => {
             card.classList.remove('selected');
@@ -954,7 +954,7 @@
         badge.textContent = '✓ Выбрано';
         cardElement.appendChild(badge);
 
-        selectedProductId = productId;
+        selectedProductId = productSlug; // Теперь это slug
         selectedProductName = productName;
 
         // Показываем секцию загрузки
@@ -1058,10 +1058,9 @@
 
         const formData = new FormData();
         formData.append('file', file);
-        formData.append('sortOrders', sortOrder);
 
         try {
-            const response = await fetch(`/api/pictures/product/admin/${selectedProductId}?sortOrders=${sortOrder}`, {
+            const response = await fetch(`/api/pictures/product/admin/slug/${selectedProductId}?sortOrders=${sortOrder}`, {
                 method: 'POST',
                 body: formData
             });
@@ -1118,7 +1117,7 @@
         formData.append('sortOrders', sortOrdersBlob);
 
         try {
-            const response = await fetch(`/api/pictures/product/admin/${selectedProductId}/more`, {
+            const response = await fetch(`/api/pictures/product/admin/slug/${selectedProductId}/more`, {
                 method: 'POST',
                 body: formData
             });
@@ -1151,7 +1150,7 @@
         if (!selectedProductId) return;
 
         try {
-            const response = await fetch(`/api/pictures/product/admin/${selectedProductId}`);
+            const response = await fetch(`/api/pictures/product/admin/slug/${selectedProductId}`);
 
             if (!response.ok) {
                 const errorData = await response.json();

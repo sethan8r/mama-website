@@ -68,6 +68,11 @@ public class PicturesProductController {
         return picturesProductService.getPicturesProductByProductIdForAdmin(productId);
     }
 
+    @GetMapping("/admin/{slug}")
+    public List<PicturesProductResponseAdminDto> getPicturesProductByProductSlugForAdmin(@PathVariable String slug) {
+        return picturesProductService.getPicturesProductByProductSlugForAdmin(slug);
+    }
+
     @DeleteMapping("/admin/{pictureId}")
     public ResponseEntity<Void> deletePicturesProductById(@PathVariable Long pictureId) {
         picturesProductService.deletePicturesProductById(pictureId);

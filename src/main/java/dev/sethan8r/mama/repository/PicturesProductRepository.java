@@ -8,4 +8,6 @@ import java.util.List;
 public interface PicturesProductRepository extends CrudRepository<PicturesProduct, Long> {
     List<PicturesProduct> findAllByProductIdOrderBySortOrderAsc(Long productId);
     List<PicturesProduct> findByProductIdInAndSortOrder(List<Long> productId, Integer sortOrder);
+    List<PicturesProduct> findAllByProductSlugOrderBySortOrderAsc(String slug);
+    List<PicturesProduct> findByProductSlugInAndSortOrder(List<String> slug, Integer sortOrder);
 }
