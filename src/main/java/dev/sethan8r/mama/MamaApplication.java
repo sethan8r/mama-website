@@ -8,7 +8,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import static org.springframework.data.web.config.EnableSpringDataWebSupport.PageSerializationMode.VIA_DTO;
 
-@EnableSpringDataWebSupport(pageSerializationMode = VIA_DTO)
+@EnableSpringDataWebSupport(pageSerializationMode = VIA_DTO) //красивая структура в PAGE
 @SpringBootApplication
 public class MamaApplication {
 

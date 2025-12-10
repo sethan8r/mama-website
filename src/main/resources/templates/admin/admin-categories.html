@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Управление категориями - Админ-панель</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #2d5f4f 0%, #1a3d32 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        /* Общий контейнер */
+        .admin-container {
+            margin: 20px;
+            min-height: calc(100vh - 40px);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(135deg, #f5f5dc 0%, #e8e4d0 100%);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Шапка админки */
+        .admin-header {
+            background: rgba(180, 180, 180, 0.25);
+            padding: 20px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid rgba(150, 150, 150, 0.2);
+            /* ⬇️ ФИКСИРУЕМ ВЫСОТУ ШАПКИ */
+            min-height: 90px;
+            max-height: 90px;
+            /* ⬆️ */
+        }
+
+        .admin-header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .admin-logo {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+        }
+
+        .admin-header h1 {
+            font-size: 2em;
+            color: #2d5f4f;
+            font-weight: normal;
+        }
+
+        .admin-nav-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .nav-button {
+            padding: 12px 25px;
+            background: rgba(150, 150, 150, 0.3);
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 1em;
+            color: #555;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+            font-family: 'Georgia', serif;
+        }
+
+        .nav-button:hover {
+            background: rgba(130, 130, 130, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Основной контент */
+        .admin-content {
+            padding: 50px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .page-title {
+            font-size: 2.5em;
+            color: #2d5f4f;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        /* Форма добавления категории */
+        .add-category-form {
+            background: rgba(200, 200, 180, 0.3);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 40px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .add-category-form h3 {
+            font-size: 1.5em;
+            color: #2d5f4f;
+            margin-bottom: 20px;
+            font-weight: normal;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #2d5f4f;
+            font-size: 1.1em;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid rgba(45, 95, 79, 0.3);
+            border-radius: 10px;
+            font-size: 1em;
+            font-family: 'Georgia', serif;
+            background: rgba(255, 255, 255, 0.9);
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #2d5f4f;
+            background: rgba(255, 255, 255, 1);
+            box-shadow: 0 0 10px rgba(45, 95, 79, 0.2);
+        }
+
+        .submit-button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #2d5f4f 0%, #1a3d32 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-family: 'Georgia', serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .submit-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(45, 95, 79, 0.4);
+        }
+
+        .submit-button:active {
+            transform: translateY(0);
+        }
+
+        /* Список категорий */
+        .categories-list {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .categories-list h3 {
+            font-size: 1.8em;
+            color: #2d5f4f;
+            margin-bottom: 25px;
+            text-align: center;
+            font-weight: normal;
+        }
+
+        .category-item {
+            background: rgba(200, 200, 180, 0.3);
+            border-radius: 15px;
+            padding: 20px 25px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .category-item:hover {
+            background: rgba(180, 180, 160, 0.4);
+            transform: translateX(5px);
+        }
+
+        .category-name {
+            font-size: 1.3em;
+            color: #2d5f4f;
+            font-weight: 500;
+            flex: 1;
+        }
+
+        .category-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95em;
+            font-family: 'Georgia', serif;
+            transition: all 0.3s ease;
+        }
+
+        .edit-button {
+            background: rgba(45, 95, 79, 0.7);
+            color: white;
+        }
+
+        .edit-button:hover {
+            background: rgba(45, 95, 79, 0.9);
+            transform: translateY(-2px);
+        }
+
+        .delete-button {
+            background: rgba(220, 53, 69, 0.7);
+            color: white;
+        }
+
+        .delete-button:hover {
+            background: rgba(220, 53, 69, 0.9);
+            transform: translateY(-2px);
+        }
+
+        /* Модальное окно для редактирования */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #f5f5dc;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-title {
+            font-size: 1.8em;
+            color: #2d5f4f;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .modal-button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1em;
+            font-family: 'Georgia', serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modal-button.primary {
+            background: linear-gradient(135deg, #2d5f4f 0%, #1a3d32 100%);
+            color: white;
+        }
+
+        .modal-button.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(45, 95, 79, 0.4);
+        }
+
+        .modal-button.secondary {
+            background: rgba(150, 150, 150, 0.3);
+            color: #555;
+        }
+
+        .modal-button.secondary:hover {
+            background: rgba(130, 130, 130, 0.4);
+        }
+
+        /* Контейнер уведомлений */
+        .notifications-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-width: 400px;
+        }
+
+        /* Уведомление */
+        .notification {
+            background: rgba(220, 53, 69, 0.95);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            animation: slideInRight 0.3s ease;
+            cursor: pointer;
+        }
+
+        .notification.success {
+            background: rgba(40, 167, 69, 0.95);
+        }
+
+        .notification.info {
+            background: rgba(23, 162, 184, 0.95);
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .notification-icon {
+            font-size: 1.5em;
+        }
+
+        .notification-content {
+            flex: 1;
+        }
+
+        .notification-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .notification-message {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .notification-close {
+            font-size: 1.2em;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+
+        .notification-close:hover {
+            opacity: 1;
+        }
+
+        /* Пустой список */
+        .empty-list {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+            font-size: 1.2em;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .admin-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .admin-header-left {
+                flex-direction: row;
+                width: 100%;
+            }
+
+            .admin-header h1 {
+                font-size: 1.5em;
+            }
+
+            .admin-content {
+                padding: 30px 20px;
+            }
+
+            .page-title {
+                font-size: 1.8em;
+            }
+
+            .category-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .category-actions {
+                width: 100%;
+            }
+
+            .action-button {
+                flex: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="admin-container">
+    <!-- Шапка админки -->
+    <div class="admin-header">
+        <div class="admin-header-left">
+            <img src="/images/logo.png" alt="Логотип" class="admin-logo">
+            <h1>Управление категориями</h1>
+        </div>
+        <div class="admin-nav-buttons">
+            <a href="/" class="nav-button">На сайт</a>
+            <a href="/admin" class="nav-button">Админка</a>
+        </div>
+    </div>
+
+    <!-- Основной контент -->
+    <div class="admin-content">
+        <h2 class="page-title">Категории товаров</h2>
+
+        <!-- Форма добавления категории -->
+        <div class="add-category-form">
+            <h3>Добавить новую категорию</h3>
+            <form id="addCategoryForm">
+                <div class="form-group">
+                    <label for="categoryName">Название категории</label>
+                    <input type="text" id="categoryName" name="name" required>
+                </div>
+                <button type="submit" class="submit-button">Добавить категорию</button>
+            </form>
+        </div>
+
+        <!-- Список категорий -->
+        <div class="categories-list">
+            <h3>Список категорий</h3>
+            <div id="categoriesContainer">
+                <!-- Категории будут загружены через JS -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно для редактирования -->
+<div class="modal-overlay" id="editModal">
+    <div class="modal-content">
+        <h3 class="modal-title">Редактировать категорию</h3>
+        <form id="editCategoryForm">
+            <div class="form-group">
+                <label for="editCategoryName">Новое название</label>
+                <input type="text" id="editCategoryName" required>
+                <input type="hidden" id="editCategoryOldName">
+            </div>
+            <div class="modal-buttons">
+                <button type="submit" class="modal-button primary">Сохранить</button>
+                <button type="button" class="modal-button secondary" onclick="closeEditModal()">Отмена</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Контейнер для уведомлений -->
+<div class="notifications-container" id="notificationsContainer"></div>
+
+<script>
+    // Функция показа уведомлений
+    function showNotification(title, message, type = 'error') {
+        const container = document.getElementById('notificationsContainer');
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+
+        const icon = type === 'error' ? '⚠️' : type === 'success' ? '✅' : 'ℹ️';
+
+        notification.innerHTML = `
+            <div class="notification-icon">${icon}</div>
+            <div class="notification-content">
+                <div class="notification-title">${title}</div>
+                <div class="notification-message">${message}</div>
+            </div>
+            <div class="notification-close" onclick="this.parentElement.remove()">✕</div>
+        `;
+
+        container.appendChild(notification);
+
+        // Автоматически удалить через 5 секунд
+        setTimeout(() => {
+            notification.remove();
+        }, 5000);
+
+        // Удалить при клике
+        notification.addEventListener('click', () => {
+            notification.remove();
+        });
+    }
+
+    // Загрузка категорий
+    async function loadCategories() {
+        try {
+            const response = await fetch('/api/category');
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                showNotification('Ошибка загрузки', errorData.message || 'Не удалось загрузить категории', 'error');
+                return;
+            }
+
+            const categories = await response.json();
+            displayCategories(categories);
+        } catch (error) {
+            console.error('Ошибка загрузки категорий:', error);
+            showNotification('Ошибка сети', 'Не удалось подключиться к серверу', 'error');
+        }
+    }
+
+    // Отображение категорий
+    function displayCategories(categories) {
+        const container = document.getElementById('categoriesContainer');
+        container.innerHTML = '';
+
+        if (categories.length === 0) {
+            container.innerHTML = '<div class="empty-list">Категории отсутствуют. Добавьте первую категорию.</div>';
+            return;
+        }
+
+        categories.forEach(category => {
+            const categoryItem = document.createElement('div');
+            categoryItem.className = 'category-item';
+            categoryItem.innerHTML = `
+                <div class="category-name">${category.name}</div>
+                <div class="category-actions">
+                    <button class="action-button edit-button" onclick="openEditModal('${category.name}')">
+                        Изменить
+                    </button>
+                    <button class="action-button delete-button" onclick="deleteCategory('${category.name}')">
+                        Удалить
+                    </button>
+                </div>
+            `;
+            container.appendChild(categoryItem);
+        });
+    }
+
+    // Добавление категории
+    document.getElementById('addCategoryForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const name = document.getElementById('categoryName').value.trim();
+
+        if (!name) {
+            showNotification('Ошибка', 'Название категории не может быть пустым', 'error');
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/category/admin', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ name })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                showNotification('Ошибка', errorData.message || 'Не удалось добавить категорию', 'error');
+                return;
+            }
+
+            showNotification('Успех', 'Категория успешно добавлена', 'success');
+            document.getElementById('categoryName').value = '';
+            await loadCategories();
+        } catch (error) {
+            console.error('Ошибка добавления категории:', error);
+            showNotification('Ошибка сети', 'Не удалось подключиться к серверу', 'error');
+        }
+    });
+
+    // Открытие модального окна редактирования
+    function openEditModal(categoryName) {
+        document.getElementById('editCategoryOldName').value = categoryName;
+        document.getElementById('editCategoryName').value = categoryName;
+        document.getElementById('editModal').classList.add('show');
+    }
+
+    // Закрытие модального окна
+    function closeEditModal() {
+        document.getElementById('editModal').classList.remove('show');
+    }
+
+    // Редактирование категории
+    document.getElementById('editCategoryForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const oldName = document.getElementById('editCategoryOldName').value;
+        const newName = document.getElementById('editCategoryName').value.trim();
+
+        if (!newName) {
+            showNotification('Ошибка', 'Название категории не может быть пустым', 'error');
+            return;
+        }
+
+        if (oldName === newName) {
+            showNotification('Предупреждение', 'Новое название совпадает со старым', 'info');
+            closeEditModal();
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/category/admin/${encodeURIComponent(oldName)}?newName=${encodeURIComponent(newName)}`, {
+                method: 'PATCH'
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                showNotification('Ошибка', errorData.message || 'Не удалось изменить категорию', 'error');
+                return;
+            }
+
+            showNotification('Успех', 'Категория успешно изменена', 'success');
+            closeEditModal();
+            await loadCategories();
+        } catch (error) {
+            console.error('Ошибка изменения категории:', error);
+            showNotification('Ошибка сети', 'Не удалось подключиться к серверу', 'error');
+        }
+    });
+
+    // Удаление категории
+    async function deleteCategory(categoryName) {
+        if (!confirm(`Вы уверены, что хотите удалить категорию "${categoryName}"?`)) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/category/admin/${encodeURIComponent(categoryName)}`, {
+                method: 'DELETE'
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                showNotification('Ошибка', errorData.message || 'Не удалось удалить категорию', 'error');
+                return;
+            }
+
+            showNotification('Успех', 'Категория успешно удалена', 'success');
+            await loadCategories();
+        } catch (error) {
+            console.error('Ошибка удаления категории:', error);
+            showNotification('Ошибка сети', 'Не удалось подключиться к серверу', 'error');
+        }
+    }
+
+    // Закрытие модального окна при клике вне его
+    document.getElementById('editModal').addEventListener('click', (e) => {
+        if (e.target.id === 'editModal') {
+            closeEditModal();
+        }
+    });
+
+    // Загрузка категорий при загрузке страницы
+    document.addEventListener('DOMContentLoaded', loadCategories);
+</script>
+</body>
+</html>

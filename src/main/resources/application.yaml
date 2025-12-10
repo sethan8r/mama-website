@@ -10,6 +10,7 @@ spring:
     url: jdbc:postgresql://localhost:5433/mama_db
     username: postgres
     password: sethan8r
+
   jpa:
     hibernate:
       ddl-auto: update
@@ -17,3 +18,8 @@ spring:
     properties:
       hibernate:
         format_sql: true
+
+  servlet:
+    multipart:
+      max-file-size: 10MB      # Максимальный размер одного файла
+      max-request-size: 10MB   # Максимальный размер всего запроса
