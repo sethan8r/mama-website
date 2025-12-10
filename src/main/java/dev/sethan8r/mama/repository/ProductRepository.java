@@ -20,16 +20,11 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     Page<Product> findByDeletedFalse(Pageable pageable);
 
-    //@EntityGraph(attributePaths = "picturesProduct")
-    Optional<Product> findByName(String name);
 
     @EntityGraph(attributePaths = "picturesProduct")
     Optional<Product> findBySlug(String slug);
 
     Page<Product> findByNameContainingIgnoreCase(String name,  Pageable pageable);
-
-    @EntityGraph(attributePaths = "picturesProduct")
-    Optional<Product> findWithPicturesByName(String name);
 
     boolean existsByCategory(Category category);
 

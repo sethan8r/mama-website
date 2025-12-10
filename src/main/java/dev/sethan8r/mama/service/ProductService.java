@@ -60,8 +60,6 @@ public class ProductService {
         product.setPrice(price);
 
         productRepository.save(product);
-
-//        return productMapper.toProductResponseAdminDto(product);
     }
 
     public Page<ProductResponseShortDto> getAllProductsShort(Pageable pageable) {
