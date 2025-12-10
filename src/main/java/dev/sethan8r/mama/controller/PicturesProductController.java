@@ -30,7 +30,7 @@ public class PicturesProductController {
         return ResponseEntity.status(HttpStatus.CREATED).body(result);
     }
 
-    @PostMapping(value ="/admin/{slug}/more", consumes = MediaType.MULTIPART_FORM_DATA_VALUE) //
+    @PostMapping(value ="/admin/slug/{slug}/more", consumes = MediaType.MULTIPART_FORM_DATA_VALUE) //
     public ResponseEntity<UploadPicturesResponseDto> createPicturesProductBySlugMany(
             @PathVariable String slug, @RequestPart("sortOrders") Integer[] sortOrders,
             @RequestPart("files") MultipartFile[] files) {
@@ -48,7 +48,7 @@ public class PicturesProductController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @PostMapping("/admin/{slug}")
+    @PostMapping("/admin/slug/{slug}")
     public ResponseEntity<Void> createPicturesProductBySlug(@PathVariable String slug,@RequestParam Integer sortOrders,
                                                       @RequestPart("file") MultipartFile file) {
         picturesProductService.createPicturesProductBySlug(slug, sortOrders, file);
