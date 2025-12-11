@@ -3,6 +3,8 @@ package dev.sethan8r.mama.model;
 import com.vladmihalcea.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.hibernate.annotations.Type;
 
 import java.util.ArrayList;
@@ -36,6 +38,8 @@ public class Product {
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("sortOrder ASC")
+    @ToString.Exclude  // Исключаем из toString()  защищают от бесконечной рекурсии и OutOfMemoryError
+    @EqualsAndHashCode.Exclude  // Исключаем из equals()/hashCode()  защищают от бесконечной рекурсии и OutOfMemoryError
     private List<PicturesProduct> picturesProduct = new ArrayList<>(); //нужно будет сортировать картинки
 
     @Column(name = "available", nullable = false)

@@ -2,6 +2,8 @@ package dev.sethan8r.mama.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 @Data
 @Entity
@@ -17,6 +19,8 @@ public class PicturesProduct {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")
+    @ToString.Exclude  // Исключаем из toString()  защищают от бесконечной рекурсии и OutOfMemoryError
+    @EqualsAndHashCode.Exclude // Исключаем из equals()/hashCode()  защищают от бесконечной рекурсии и OutOfMemoryError
     private Product product;
 
     @Column(name = "sort_order")

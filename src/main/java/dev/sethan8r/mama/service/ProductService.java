@@ -159,10 +159,17 @@ public class ProductService {
         List<PicturesProduct> pics = picturesProductRepository
                 .findByProductIdInAndSortOrder(ids, 0);
 
+//        Map<Long, PicturesProduct> mainPicMap = pics.stream()
+//                .collect(Collectors.toMap(
+//                        p -> p.getProduct().getId(),
+//                        p -> p
+//                ));
+
         Map<Long, PicturesProduct> mainPicMap = pics.stream()
                 .collect(Collectors.toMap(
                         p -> p.getProduct().getId(),
-                        p -> p
+                        p -> p,
+                        (existing, replacement) -> existing  // Берем первую найденную
                 ));
 
         return products.map(product -> {
