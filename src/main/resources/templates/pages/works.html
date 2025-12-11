@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Google Analytics -->
+    <th:block th:replace="~{fragments/analytics :: analytics}"></th:block>
+
+    <title>Примеры работ - ИндТурПошив</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #2d5f4f 0%, #1a3d32 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        /* Общий контейнер */
+        .main-container {
+            margin: 20px;
+            min-height: calc(100vh - 40px);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(135deg, #f5f5dc 0%, #e8e4d0 100%);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Шапка */
+        .header {
+            background: rgba(180, 180, 180, 0.25);
+            padding: 20px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid rgba(150, 150, 150, 0.2);
+            min-height: 90px;
+            max-height: 90px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            cursor: pointer;
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+        }
+
+        .header h1 {
+            font-size: 2em;
+            color: #2d5f4f;
+            font-weight: normal;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .nav-button {
+            padding: 12px 25px;
+            background: rgba(150, 150, 150, 0.3);
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 1em;
+            color: #555;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+            font-family: 'Georgia', serif;
+        }
+
+        .nav-button:hover {
+            background: rgba(130, 130, 130, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Основной контент */
+        .content {
+            padding: 50px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .page-title {
+            font-size: 2.5em;
+            color: #2d5f4f;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .page-subtitle {
+            font-size: 1.3em;
+            color: #666;
+            text-align: center;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+
+        /* Контейнер работ */
+        .works-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Панель управления */
+        .controls-panel {
+            background: rgba(200, 200, 180, 0.3);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .control-label {
+            font-size: 1.1em;
+            color: #2d5f4f;
+            font-weight: 500;
+        }
+
+        .control-select {
+            padding: 10px 15px;
+            background: rgba(255, 255, 255, 0.8);
+            border: 2px solid rgba(45, 95, 79, 0.3);
+            border-radius: 10px;
+            font-size: 1em;
+            color: #333;
+            cursor: pointer;
+            font-family: 'Georgia', serif;
+            transition: all 0.3s ease;
+        }
+
+        .control-select:hover {
+            border-color: #2d5f4f;
+        }
+
+        .control-select:focus {
+            outline: none;
+            border-color: #2d5f4f;
+            box-shadow: 0 0 5px rgba(45, 95, 79, 0.3);
+        }
+
+        /* Сетка работ */
+        .works-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .works-grid.size-12 {
+            grid-template-columns: repeat(4, 1fr);
+        }
+
+        .works-grid.size-16 {
+            grid-template-columns: repeat(4, 1fr);
+        }
+
+        .works-grid.size-20 {
+            grid-template-columns: repeat(5, 1fr);
+        }
+
+        /* Элемент работы */
+        .work-item {
+            position: relative;
+            aspect-ratio: 16 / 9;
+            background: rgba(220, 220, 200, 0.5);
+            border-radius: 15px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .work-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .work-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: all 0.3s ease;
+        }
+
+        .work-item:hover .work-image {
+            filter: grayscale(50%) brightness(0.7);
+        }
+
+        /* Оверлей с информацией */
+        .work-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .work-item:hover .work-overlay {
+            opacity: 1;
+        }
+
+        .work-overlay-title {
+            font-size: 1.3em;
+            color: white;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .work-overlay-description {
+            font-size: 0.95em;
+            color: rgba(255, 255, 255, 0.9);
+            text-align: center;
+            line-height: 1.4;
+        }
+
+        /* Загрузка */
+        .loading {
+            text-align: center;
+            padding: 100px 20px;
+            font-size: 1.5em;
+            color: #2d5f4f;
+        }
+
+        /* Пустой результат */
+        .empty-results {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+            font-size: 1.2em;
+        }
+
+        /* Пагинация */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .pagination-info {
+            font-size: 1em;
+            color: #2d5f4f;
+        }
+
+        .pagination-button {
+            padding: 10px 20px;
+            background: rgba(150, 150, 150, 0.3);
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1em;
+            color: #555;
+            font-family: 'Georgia', serif;
+            transition: all 0.3s ease;
+        }
+
+        .pagination-button:hover:not(:disabled) {
+            background: rgba(130, 130, 130, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .pagination-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Модальное окно */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            padding: 20px;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal-content {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 40px;
+            max-width: 90vw;
+            max-height: 90vh;
+            background: linear-gradient(135deg, #f5f5dc 0%, #e8e4d0 100%);
+            border-radius: 15px;
+            overflow: hidden;
+            animation: zoomIn 0.3s ease;
+            position: relative;
+        }
+
+        @keyframes zoomIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .modal-image-section {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(200, 200, 180, 0.3);
+            padding: 20px;
+        }
+
+        .modal-image {
+            max-width: 100%;
+            max-height: 80vh;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-info-section {
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow-y: auto;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(220, 53, 69, 0.9);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 1.5em;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .modal-close:hover {
+            background: rgba(220, 53, 69, 1);
+            transform: scale(1.1);
+        }
+
+        .modal-title {
+            font-size: 2.5em;
+            color: #2d5f4f;
+            font-weight: bold;
+            margin-bottom: 25px;
+            line-height: 1.2;
+        }
+
+        .modal-description {
+            font-size: 1.2em;
+            color: #333;
+            line-height: 1.8;
+            margin-bottom: 30px;
+        }
+
+        .modal-banner {
+            background: linear-gradient(135deg, #2d5f4f 0%, #1a3d32 100%);
+            color: white;
+            padding: 25px 30px;
+            border-radius: 15px;
+            text-align: center;
+            font-size: 1.1em;
+            line-height: 1.6;
+        }
+
+        .modal-banner a {
+            color: #f5f5dc;
+            text-decoration: underline;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .modal-banner a:hover {
+            color: white;
+        }
+
+        /* Контейнер уведомлений */
+        .notifications-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-width: 400px;
+        }
+
+        .notification {
+            background: rgba(220, 53, 69, 0.95);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            animation: slideInRight 0.3s ease;
+            cursor: pointer;
+        }
+
+        .notification.success {
+            background: rgba(40, 167, 69, 0.95);
+        }
+
+        .notification.info {
+            background: rgba(23, 162, 184, 0.95);
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .notification-icon {
+            font-size: 1.5em;
+        }
+
+        .notification-content {
+            flex: 1;
+        }
+
+        .notification-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .notification-message {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .notification-close {
+            font-size: 1.2em;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+
+        .notification-close:hover {
+            opacity: 1;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 1400px) {
+            .works-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .works-grid.size-12,
+            .works-grid.size-16,
+            .works-grid.size-20 {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .works-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .works-grid.size-12,
+            .works-grid.size-16,
+            .works-grid.size-20 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .modal-content {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-info-section {
+                padding: 30px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+                min-height: auto;
+                max-height: none;
+                padding: 20px 25px;
+            }
+
+            .header-left {
+                width: 100%;
+            }
+
+            .header h1 {
+                font-size: 1.5em;
+            }
+
+            .nav-buttons {
+                flex-wrap: wrap;
+                width: 100%;
+            }
+
+            .nav-button {
+                flex: 1;
+                min-width: 120px;
+                text-align: center;
+            }
+
+            .content {
+                padding: 30px 20px;
+            }
+
+            .page-title {
+                font-size: 1.8em;
+            }
+
+            .page-subtitle {
+                font-size: 1.1em;
+            }
+
+            .controls-panel {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .works-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .works-grid.size-12,
+            .works-grid.size-16,
+            .works-grid.size-20 {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-title {
+                font-size: 1.8em;
+            }
+
+            .modal-description {
+                font-size: 1em;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="main-container">
+    <!-- Шапка -->
+    <div class="header">
+        <div class="header-left" onclick="window.location.href='/'">
+            <img src="/images/logo.png" alt="Логотип" class="logo">
+            <h1>ИндТурПошив</h1>
+        </div>
+        <div class="nav-buttons">
+            <a href="/works" class="nav-button">Примеры работ</a>
+            <a href="/products" class="nav-button">Каталог</a>
+            <a href="/contacts" class="nav-button">Контакты</a>
+        </div>
+    </div>
+
+    <!-- Основной контент -->
+    <div class="content">
+        <h1 class="page-title">Примеры наших работ</h1>
+        <p class="page-subtitle">
+            Посмотрите, что мы создали для наших клиентов
+        </p>
+
+        <div class="works-container">
+            <!-- Панель управления -->
+            <div class="controls-panel">
+                <div class="control-group">
+                    <span class="control-label">Показывать по:</span>
+                    <select id="pageSizeSelect" class="control-select" onchange="changePageSize()">
+                        <option value="9" selected>9 элементов</option>
+                        <option value="12">12 элементов</option>
+                        <option value="16">16 элементов</option>
+                        <option value="20">20 элементов</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <span class="control-label">Сортировка:</span>
+                    <select id="sortSelect" class="control-select" onchange="changeSortOrder()">
+                        <option value="DESC" selected>От новых к старым</option>
+                        <option value="ASC">От старых к новым</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Загрузка -->
+            <div id="loadingContainer" class="loading">
+                Загрузка примеров работ...
+            </div>
+
+            <!-- Сетка работ -->
+            <div id="worksGrid" class="works-grid" style="display: none;">
+                <!-- Работы будут загружены через JS -->
+            </div>
+
+            <!-- Пустой результат -->
+            <div id="emptyContainer" class="empty-results" style="display: none;">
+                Примеры работ не найдены
+            </div>
+
+            <!-- Пагинация -->
+            <div class="pagination" id="paginationContainer" style="display: none;">
+                <button class="pagination-button" id="prevButton" onclick="changePage(-1)">
+                    ← Назад
+                </button>
+                <div class="pagination-info">
+                    Страница <span id="currentPage">1</span> из <span id="totalPages">1</span>
+                    (всего: <span id="totalElements">0</span>)
+                </div>
+                <button class="pagination-button" id="nextButton" onclick="changePage(1)">
+                    Вперед →
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно -->
+<div class="modal-overlay" id="workModal">
+    <div class="modal-content">
+        <button class="modal-close" onclick="closeModal()">✕</button>
+
+        <div class="modal-image-section">
+            <img id="modalImage" class="modal-image" src="" alt="Пример работы">
+        </div>
+
+        <div class="modal-info-section">
+            <div>
+                <h2 class="modal-title" id="modalTitle">Название работы</h2>
+                <p class="modal-description" id="modalDescription">Описание работы</p>
+            </div>
+
+            <div class="modal-banner">
+                Для заказа напишите нам, наши контакты вы можете найти на странице
+                <a href="/contacts">"КОНТАКТЫ"</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Контейнер для уведомлений -->
+<div class="notifications-container" id="notificationsContainer"></div>
+
+<script>
+    let currentPage = 0;
+    let totalPages = 0;
+    let totalElements = 0;
+    let pageSize = 9;
+    let sortDirection = 'DESC';
+    let worksData = [];
+
+    // Функция показа уведомлений
+    function showNotification(title, message, type = 'error') {
+        const container = document.getElementById('notificationsContainer');
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+
+        const icon = type === 'error' ? '⚠️' : type === 'success' ? '✅' : 'ℹ️';
+
+        notification.innerHTML = `
+            <div class="notification-icon">${icon}</div>
+            <div class="notification-content">
+                <div class="notification-title">${title}</div>
+                <div class="notification-message">${message}</div>
+            </div>
+            <div class="notification-close" onclick="this.parentElement.remove()">✕</div>
+        `;
+
+        container.appendChild(notification);
+
+        setTimeout(() => {
+            notification.remove();
+        }, 5000);
+
+        notification.addEventListener('click', () => {
+            notification.remove();
+        });
+    }
+
+    // Загрузка работ
+    async function loadWorks(page = 0) {
+        try {
+            // Показываем индикатор загрузки
+            document.getElementById('loadingContainer').style.display = 'block';
+            document.getElementById('worksGrid').style.display = 'none';
+            document.getElementById('emptyContainer').style.display = 'none';
+            document.getElementById('paginationContainer').style.display = 'none';
+
+            const response = await fetch(`/api/pictures/works?page=${page}&size=${pageSize}&sort=id,${sortDirection}`);
+
+            if (!response.ok) {
+                throw new Error('Ошибка загрузки работ');
+            }
+
+            const data = await response.json();
+
+            // Обработка формата VIA_DTO
+            worksData = data.content || [];
+            currentPage = data.page?.number || 0;
+            totalPages = data.page?.totalPages || 1;
+            totalElements = data.page?.totalElements || 0;
+
+            displayWorks(worksData);
+            updatePagination();
+        } catch (error) {
+            console.error('Ошибка загрузки работ:', error);
+            showNotification('Ошибка', 'Не удалось загрузить примеры работ', 'error');
+            document.getElementById('loadingContainer').style.display = 'none';
+            document.getElementById('emptyContainer').style.display = 'block';
+        }
+    }
+
+    // Отображение работ
+    function displayWorks(works) {
+        const grid = document.getElementById('worksGrid');
+        document.getElementById('loadingContainer').style.display = 'none';
+
+        if (!works || works.length === 0) {
+            document.getElementById('emptyContainer').style.display = 'block';
+            return;
+        }
+
+        // Устанавливаем класс сетки в зависимости от pageSize
+        grid.className = 'works-grid';
+        if (pageSize === 12) {
+            grid.classList.add('size-12');
+        } else if (pageSize === 16) {
+            grid.classList.add('size-16');
+        } else if (pageSize === 20) {
+            grid.classList.add('size-20');
+        }
+
+        grid.innerHTML = '';
+        grid.style.display = 'grid';
+
+        works.forEach(work => {
+            const workItem = document.createElement('div');
+            workItem.className = 'work-item';
+            workItem.onclick = () => openModal(work);
+
+            workItem.innerHTML = `
+                <img src="${work.url}" alt="${work.name}" class="work-image">
+                <div class="work-overlay">
+                    <div class="work-overlay-title">${work.name}</div>
+                    <div class="work-overlay-description">${work.description}</div>
+                </div>
+            `;
+
+            grid.appendChild(workItem);
+        });
+    }
+
+    // Обновление пагинации
+    function updatePagination() {
+        const paginationContainer = document.getElementById('paginationContainer');
+
+        if (totalPages <= 1) {
+            paginationContainer.style.display = 'none';
+            return;
+        }
+
+        paginationContainer.style.display = 'flex';
+
+        document.getElementById('currentPage').textContent = currentPage + 1;
+        document.getElementById('totalPages').textContent = totalPages;
+        document.getElementById('totalElements').textContent = totalElements;
+
+        const prevButton = document.getElementById('prevButton');
+        const nextButton = document.getElementById('nextButton');
+
+        prevButton.disabled = currentPage === 0;
+        nextButton.disabled = currentPage === totalPages - 1;
+    }
+
+    // Смена страницы
+    function changePage(delta) {
+        const newPage = currentPage + delta;
+        if (newPage >= 0 && newPage < totalPages) {
+            loadWorks(newPage);
+        }
+    }
+
+    // Смена размера страницы
+    function changePageSize() {
+        pageSize = parseInt(document.getElementById('pageSizeSelect').value);
+        loadWorks(0);
+    }
+
+    // Смена сортировки
+    function changeSortOrder() {
+        sortDirection = document.getElementById('sortSelect').value;
+        loadWorks(0);
+    }
+
+    // Открытие модального окна
+    function openModal(work) {
+        document.getElementById('modalImage').src = work.url;
+        document.getElementById('modalTitle').textContent = work.name;
+        document.getElementById('modalDescription').textContent = work.description;
+        document.getElementById('workModal').classList.add('show');
+    }
+
+    // Закрытие модального окна
+    function closeModal() {
+        document.getElementById('workModal').classList.remove('show');
+    }
+
+    // Закрытие модального окна при клике вне контента
+    document.getElementById('workModal').addEventListener('click', (e) => {
+        if (e.target.id === 'workModal') {
+            closeModal();
+        }
+    });
+
+    // Закрытие модального окна по ESC
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            closeModal();
+        }
+    });
+
+    // Загрузка работ при загрузке страницы
+    document.addEventListener('DOMContentLoaded', () => {
+        loadWorks(0);
+    });
+</script>
+</body>
+</html>

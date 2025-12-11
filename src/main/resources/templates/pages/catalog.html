@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Google Analytics -->
+    <th:block th:replace="~{fragments/analytics :: analytics}"></th:block>
+
+    <title>Каталог - ИндТурПошив</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #2d5f4f 0%, #1a3d32 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        /* Общий контейнер */
+        .main-container {
+            margin: 20px;
+            min-height: calc(100vh - 40px);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(135deg, #f5f5dc 0%, #e8e4d0 100%);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Шапка */
+        .header {
+            background: rgba(180, 180, 180, 0.25);
+            padding: 20px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid rgba(150, 150, 150, 0.2);
+            min-height: 90px;
+            max-height: 90px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            cursor: pointer;
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+        }
+
+        .header h1 {
+            font-size: 2em;
+            color: #2d5f4f;
+            font-weight: normal;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .nav-button {
+            padding: 12px 25px;
+            background: rgba(150, 150, 150, 0.3);
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 1em;
+            color: #555;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+            font-family: 'Georgia', serif;
+        }
+
+        .nav-button:hover {
+            background: rgba(130, 130, 130, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Основной контент */
+        .content {
+            padding: 50px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .page-title {
+            font-size: 2.5em;
+            color: #2d5f4f;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .page-subtitle {
+            font-size: 1.3em;
+            color: #666;
+            text-align: center;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+
+        /* Контейнер каталога */
+        .catalog-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Панель управления */
+        .controls-panel {
+            background: rgba(200, 200, 180, 0.3);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .controls-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .control-label {
+            font-size: 1.1em;
+            color: #2d5f4f;
+            font-weight: 500;
+        }
+
+        .control-select {
+            padding: 10px 15px;
+            background: rgba(255, 255, 255, 0.8);
+            border: 2px solid rgba(45, 95, 79, 0.3);
+            border-radius: 10px;
+            font-size: 1em;
+            color: #333;
+            cursor: pointer;
+            font-family: 'Georgia', serif;
+            transition: all 0.3s ease;
+            min-width: 180px;
+        }
+
+        .control-select:hover {
+            border-color: #2d5f4f;
+        }
+
+        .control-select:focus {
+            outline: none;
+            border-color: #2d5f4f;
+            box-shadow: 0 0 5px rgba(45, 95, 79, 0.3);
+        }
+
+        /* Поиск */
+        .search-wrapper {
+            display: flex;
+            gap: 10px;
+            flex: 1;
+            max-width: 500px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 10px 15px;
+            background: rgba(255, 255, 255, 0.8);
+            border: 2px solid rgba(45, 95, 79, 0.3);
+            border-radius: 10px;
+            font-size: 1em;
+            color: #333;
+            font-family: 'Georgia', serif;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #2d5f4f;
+            box-shadow: 0 0 5px rgba(45, 95, 79, 0.3);
+        }
+
+        .search-button {
+            padding: 10px 25px;
+            background: linear-gradient(135deg, #2d5f4f 0%, #1a3d32 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1em;
+            cursor: pointer;
+            font-family: 'Georgia', serif;
+            transition: all 0.3s ease;
+        }
+
+        .search-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .clear-button {
+            padding: 10px 20px;
+            background: rgba(150, 150, 150, 0.3);
+            color: #555;
+            border: none;
+            border-radius: 10px;
+            font-size: 1em;
+            cursor: pointer;
+            font-family: 'Georgia', serif;
+            transition: all 0.3s ease;
+        }
+
+        .clear-button:hover {
+            background: rgba(130, 130, 130, 0.4);
+        }
+
+        /* Сетка продуктов */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .products-grid.size-12 {
+            grid-template-columns: repeat(4, 1fr);
+        }
+
+        .products-grid.size-15 {
+            grid-template-columns: repeat(5, 1fr);
+        }
+
+        .products-grid.size-18 {
+            grid-template-columns: repeat(6, 1fr);
+        }
+
+        /* Карточка продукта */
+        .product-card {
+            background: rgba(220, 220, 200, 0.5);
+            border-radius: 15px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .product-card.unavailable {
+            filter: grayscale(70%);
+            opacity: 0.7;
+        }
+
+        .product-image-wrapper {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            overflow: hidden;
+        }
+
+        .product-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .unavailable-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(220, 53, 69, 0.9);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 500;
+        }
+
+        .product-info {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            flex: 1;
+        }
+
+        .product-name {
+            font-size: 1.2em;
+            color: #2d5f4f;
+            font-weight: 500;
+            line-height: 1.3;
+        }
+
+        .product-price {
+            font-size: 1.3em;
+            color: #1a3d32;
+            font-weight: 600;
+            margin-top: auto;
+        }
+
+        /* Загрузка */
+        .loading {
+            text-align: center;
+            padding: 100px 20px;
+            font-size: 1.5em;
+            color: #2d5f4f;
+        }
+
+        /* Пустой результат */
+        .empty-results {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+            font-size: 1.2em;
+        }
+
+        /* Пагинация */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .pagination-info {
+            font-size: 1em;
+            color: #2d5f4f;
+        }
+
+        .pagination-button {
+            padding: 10px 20px;
+            background: rgba(150, 150, 150, 0.3);
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1em;
+            color: #555;
+            font-family: 'Georgia', serif;
+            transition: all 0.3s ease;
+        }
+
+        .pagination-button:hover:not(:disabled) {
+            background: rgba(130, 130, 130, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .pagination-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Контейнер уведомлений */
+        .notifications-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-width: 400px;
+        }
+
+        .notification {
+            background: rgba(220, 53, 69, 0.95);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            animation: slideInRight 0.3s ease;
+            cursor: pointer;
+        }
+
+        .notification.success {
+            background: rgba(40, 167, 69, 0.95);
+        }
+
+        .notification.info {
+            background: rgba(23, 162, 184, 0.95);
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .notification-icon {
+            font-size: 1.5em;
+        }
+
+        .notification-content {
+            flex: 1;
+        }
+
+        .notification-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .notification-message {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .notification-close {
+            font-size: 1.2em;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+
+        .notification-close:hover {
+            opacity: 1;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 1400px) {
+            .products-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .products-grid.size-12,
+            .products-grid.size-15,
+            .products-grid.size-18 {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .products-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .products-grid.size-12,
+            .products-grid.size-15,
+            .products-grid.size-18 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+                min-height: auto;
+                max-height: none;
+                padding: 20px 25px;
+            }
+
+            .header-left {
+                width: 100%;
+            }
+
+            .header h1 {
+                font-size: 1.5em;
+            }
+
+            .nav-buttons {
+                flex-wrap: wrap;
+                width: 100%;
+            }
+
+            .nav-button {
+                flex: 1;
+                min-width: 120px;
+                text-align: center;
+            }
+
+            .content {
+                padding: 30px 20px;
+            }
+
+            .page-title {
+                font-size: 1.8em;
+            }
+
+            .page-subtitle {
+                font-size: 1.1em;
+            }
+
+            .controls-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-wrapper {
+                max-width: none;
+            }
+
+            .products-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .products-grid.size-12,
+            .products-grid.size-15,
+            .products-grid.size-18 {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="main-container">
+    <!-- Шапка -->
+    <div class="header">
+        <div class="header-left" onclick="window.location.href='/'">
+            <img src="/images/logo.png" alt="Логотип" class="logo">
+            <h1>ИндТурПошив</h1>
+        </div>
+        <div class="nav-buttons">
+            <a href="/works" class="nav-button">Примеры работ</a>
+            <a href="/products" class="nav-button">Каталог</a>
+            <a href="/contacts" class="nav-button">Контакты</a>
+        </div>
+    </div>
+
+    <!-- Основной контент -->
+    <div class="content">
+        <h1 class="page-title">Каталог товаров</h1>
+        <p class="page-subtitle">
+            Выберите товар из нашего ассортимента
+        </p>
+
+        <div class="catalog-container">
+            <!-- Панель управления -->
+            <div class="controls-panel">
+                <!-- Первая строка: поиск -->
+                <div class="controls-row">
+                    <div class="search-wrapper">
+                        <input type="text" id="searchInput" class="search-input"
+                               placeholder="Поиск товаров по названию...">
+                        <button class="search-button" onclick="searchProducts()">Найти</button>
+                        <button class="clear-button" onclick="clearSearch()">Сбросить</button>
+                    </div>
+                </div>
+
+                <!-- Вторая строка: фильтры -->
+                <div class="controls-row">
+                    <div class="control-group">
+                        <span class="control-label">Категория:</span>
+                        <select id="categorySelect" class="control-select" onchange="filterByCategory()">
+                            <option value="">Все категории</option>
+                            <!-- Категории будут загружены через JS -->
+                        </select>
+                    </div>
+
+                    <div class="control-group">
+                        <span class="control-label">Сортировка:</span>
+                        <select id="sortSelect" class="control-select" onchange="changeSorting()">
+                            <option value="id,DESC" selected>От новых к старым</option>
+                            <option value="id,ASC">От старых к новым</option>
+                            <option value="name,ASC">По имени (А-Я)</option>
+                            <option value="name,DESC">По имени (Я-А)</option>
+                            <option value="price,ASC">По цене (возрастание)</option>
+                            <option value="price,DESC">По цене (убывание)</option>
+                            <option value="available,DESC">Сначала доступные</option>
+                            <option value="available,ASC">Сначала недоступные</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group">
+                        <span class="control-label">Показывать по:</span>
+                        <select id="pageSizeSelect" class="control-select" onchange="changePageSize()">
+                            <option value="9" selected>9 товаров</option>
+                            <option value="12">12 товаров</option>
+                            <option value="15">15 товаров</option>
+                            <option value="18">18 товаров</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Загрузка -->
+            <div id="loadingContainer" class="loading">
+                Загрузка товаров...
+            </div>
+
+            <!-- Сетка товаров -->
+            <div id="productsGrid" class="products-grid" style="display: none;">
+                <!-- Товары будут загружены через JS -->
+            </div>
+
+            <!-- Пустой результат -->
+            <div id="emptyContainer" class="empty-results" style="display: none;">
+                Товары не найдены
+            </div>
+
+            <!-- Пагинация -->
+            <div class="pagination" id="paginationContainer" style="display: none;">
+                <button class="pagination-button" id="prevButton" onclick="changePage(-1)">
+                    ← Назад
+                </button>
+                <div class="pagination-info">
+                    Страница <span id="currentPage">1</span> из <span id="totalPages">1</span>
+                    (всего: <span id="totalElements">0</span>)
+                </div>
+                <button class="pagination-button" id="nextButton" onclick="changePage(1)">
+                    Вперед →
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Контейнер для уведомлений -->
+<div class="notifications-container" id="notificationsContainer"></div>
+
+<script>
+    let currentPage = 0;
+    let totalPages = 0;
+    let totalElements = 0;
+    let pageSize = 9;
+    let currentSort = 'id,DESC';
+    let currentMode = 'all'; // all, category, search
+    let currentCategoryName = '';
+    let currentSearchQuery = '';
+
+    // Функция показа уведомлений
+    function showNotification(title, message, type = 'error') {
+        const container = document.getElementById('notificationsContainer');
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+
+        const icon = type === 'error' ? '⚠️' : type === 'success' ? '✅' : 'ℹ️';
+
+        notification.innerHTML = `
+            <div class="notification-icon">${icon}</div>
+            <div class="notification-content">
+                <div class="notification-title">${title}</div>
+                <div class="notification-message">${message}</div>
+            </div>
+            <div class="notification-close" onclick="this.parentElement.remove()">✕</div>
+        `;
+
+        container.appendChild(notification);
+
+        setTimeout(() => {
+            notification.remove();
+        }, 5000);
+
+        notification.addEventListener('click', () => {
+            notification.remove();
+        });
+    }
+
+    // Обработка ошибок API
+    async function handleApiError(response) {
+        let errorMessage = 'Произошла ошибка';
+
+        try {
+            const errorData = await response.json();
+
+            // Обработка ValidationErrorResponse
+            if (errorData.errors && Array.isArray(errorData.errors)) {
+                const fieldErrors = errorData.errors.map(err => `${err.field}: ${err.message}`).join(', ');
+                errorMessage = `Ошибка валидации: ${fieldErrors}`;
+            }
+            // Обработка ErrorResponse
+            else if (errorData.message) {
+                errorMessage = errorData.message;
+            }
+        } catch (e) {
+            // Если не удалось распарсить JSON, используем статус
+            switch (response.status) {
+                case 400:
+                    errorMessage = 'Неверный запрос';
+                    break;
+                case 401:
+                    errorMessage = 'Неверный логин или пароль';
+                    break;
+                case 403:
+                    errorMessage = 'Доступ запрещен';
+                    break;
+                case 404:
+                    errorMessage = 'Ресурс не найден';
+                    break;
+                case 409:
+                    errorMessage = 'Конфликт данных';
+                    break;
+                case 413:
+                    errorMessage = 'Размер файла слишком большой. Максимальный размер: 10 МБ';
+                    break;
+                case 500:
+                    errorMessage = 'Произошла ошибка сервера';
+                    break;
+                default:
+                    errorMessage = `Ошибка ${response.status}`;
+            }
+        }
+
+        showNotification('Ошибка', errorMessage, 'error');
+    }
+
+    // Загрузка категорий
+    async function loadCategories() {
+        try {
+            const response = await fetch('/api/category');
+
+            if (!response.ok) {
+                await handleApiError(response);
+                return;
+            }
+
+            const categories = await response.json();
+            const select = document.getElementById('categorySelect');
+
+            categories.forEach(category => {
+                const option = document.createElement('option');
+                option.value = category.name;
+                option.textContent = category.name;
+                select.appendChild(option);
+            });
+        } catch (error) {
+            console.error('Ошибка загрузки категорий:', error);
+            showNotification('Ошибка', 'Не удалось загрузить категории', 'error');
+        }
+    }
+
+    // Загрузка всех товаров
+    async function loadAllProducts(page = 0) {
+        currentMode = 'all';
+        await loadProducts(`/api/product/short?page=${page}&size=${pageSize}&sort=${currentSort}`, page);
+    }
+
+    // Фильтрация по категории
+    async function filterByCategory() {
+        const categoryName = document.getElementById('categorySelect').value;
+
+        if (!categoryName) {
+            loadAllProducts(0);
+            return;
+        }
+
+        currentMode = 'category';
+        currentCategoryName = categoryName;
+        await loadProducts(`/api/product?categoryName=${encodeURIComponent(categoryName)}&page=0&size=${pageSize}&sort=${currentSort}`, 0);
+    }
+
+    // Поиск товаров
+    async function searchProducts() {
+        const searchQuery = document.getElementById('searchInput').value.trim();
+
+        if (!searchQuery) {
+            showNotification('Предупреждение', 'Введите название товара для поиска', 'info');
+            return;
+        }
+
+        currentMode = 'search';
+        currentSearchQuery = searchQuery;
+        await loadProducts(`/api/product/search?name=${encodeURIComponent(searchQuery)}&page=0&size=${pageSize}&sort=${currentSort}`, 0);
+    }
+
+    // Смена сортировки
+    function changeSorting() {
+        currentSort = document.getElementById('sortSelect').value;
+
+        if (currentMode === 'all') {
+            loadAllProducts(0);
+        } else if (currentMode === 'category') {
+            filterByCategory();
+        } else if (currentMode === 'search') {
+            searchProducts();
+        }
+    }
+
+    // Сброс поиска
+    function clearSearch() {
+        document.getElementById('searchInput').value = '';
+        document.getElementById('categorySelect').value = '';
+        document.getElementById('sortSelect').value = 'id,DESC';
+        currentSort = 'id,DESC';
+        loadAllProducts(0);
+    }
+
+    // Универсальная загрузка товаров
+    async function loadProducts(url, page) {
+        try {
+            // Показываем индикатор загрузки
+            document.getElementById('loadingContainer').style.display = 'block';
+            document.getElementById('productsGrid').style.display = 'none';
+            document.getElementById('emptyContainer').style.display = 'none';
+            document.getElementById('paginationContainer').style.display = 'none';
+
+            const response = await fetch(url);
+
+            if (!response.ok) {
+                await handleApiError(response);
+                document.getElementById('loadingContainer').style.display = 'none';
+                document.getElementById('emptyContainer').style.display = 'block';
+                return;
+            }
+
+            const data = await response.json();
+
+            // Обработка формата VIA_DTO
+            const products = data.content || [];
+            currentPage = data.page?.number || 0;
+            totalPages = data.page?.totalPages || 1;
+            totalElements = data.page?.totalElements || 0;
+
+            displayProducts(products);
+            updatePagination();
+        } catch (error) {
+            console.error('Ошибка загрузки товаров:', error);
+            showNotification('Ошибка', 'Не удалось загрузить товары. Проверьте подключение к сети.', 'error');
+            document.getElementById('loadingContainer').style.display = 'none';
+            document.getElementById('emptyContainer').style.display = 'block';
+        }
+    }
+
+    // Отображение товаров
+    function displayProducts(products) {
+        const grid = document.getElementById('productsGrid');
+        document.getElementById('loadingContainer').style.display = 'none';
+
+        if (!products || products.length === 0) {
+            document.getElementById('emptyContainer').style.display = 'block';
+            return;
+        }
+
+        // Устанавливаем класс сетки в зависимости от pageSize
+        grid.className = 'products-grid';
+        if (pageSize === 12) {
+            grid.classList.add('size-12');
+        } else if (pageSize === 15) {
+            grid.classList.add('size-15');
+        } else if (pageSize === 18) {
+            grid.classList.add('size-18');
+        }
+
+        grid.innerHTML = '';
+        grid.style.display = 'grid';
+
+        products.forEach(product => {
+            const card = document.createElement('div');
+            card.className = `product-card ${!product.available ? 'unavailable' : ''}`;
+            card.onclick = () => window.location.href = `/products/${product.slug}`;
+
+            const unavailableBadge = !product.available ?
+                '<div class="unavailable-badge">Временно недоступен</div>' : '';
+
+            card.innerHTML = `
+                <div class="product-image-wrapper">
+                    <img src="${product.mainPictureUrl || '/images/logo.png'}"
+                         alt="${product.name}" class="product-image">
+                    ${unavailableBadge}
+                </div>
+                <div class="product-info">
+                    <div class="product-name">${product.name}</div>
+                    <div class="product-price">${product.price || 'Цена не указана'}</div>
+                </div>
+            `;
+
+            grid.appendChild(card);
+        });
+    }
+
+    // Обновление пагинации
+    function updatePagination() {
+        const paginationContainer = document.getElementById('paginationContainer');
+
+        if (totalPages <= 1) {
+            paginationContainer.style.display = 'none';
+            return;
+        }
+
+        paginationContainer.style.display = 'flex';
+
+        document.getElementById('currentPage').textContent = currentPage + 1;
+        document.getElementById('totalPages').textContent = totalPages;
+        document.getElementById('totalElements').textContent = totalElements;
+
+        const prevButton = document.getElementById('prevButton');
+        const nextButton = document.getElementById('nextButton');
+
+        prevButton.disabled = currentPage === 0;
+        nextButton.disabled = currentPage === totalPages - 1;
+    }
+
+    // Смена страницы
+    function changePage(delta) {
+        const newPage = currentPage + delta;
+        if (newPage >= 0 && newPage < totalPages) {
+            if (currentMode === 'all') {
+                loadAllProducts(newPage);
+            } else if (currentMode === 'category') {
+                loadProducts(`/api/product?categoryName=${encodeURIComponent(currentCategoryName)}&page=${newPage}&size=${pageSize}&sort=${currentSort}`, newPage);
+            } else if (currentMode === 'search') {
+                loadProducts(`/api/product/search?name=${encodeURIComponent(currentSearchQuery)}&page=${newPage}&size=${pageSize}&sort=${currentSort}`, newPage);
+            }
+        }
+    }
+
+    // Смена размера страницы
+    function changePageSize() {
+        pageSize = parseInt(document.getElementById('pageSizeSelect').value);
+
+        if (currentMode === 'all') {
+            loadAllProducts(0);
+        } else if (currentMode === 'category') {
+            filterByCategory();
+        } else if (currentMode === 'search') {
+            searchProducts();
+        }
+    }
+
+    // Поиск по Enter
+    document.getElementById('searchInput').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            searchProducts();
+        }
+    });
+
+    // Загрузка при загрузке страницы
+    document.addEventListener('DOMContentLoaded', () => {
+        loadCategories();
+        loadAllProducts(0);
+    });
+</script>
+</body>
+</html>

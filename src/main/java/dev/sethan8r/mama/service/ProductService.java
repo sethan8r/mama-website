@@ -70,6 +70,14 @@ public class ProductService {
         return mapToShortDtoWithMainPicture(products);
     }
 
+    public Page<ProductResponseShortDto> getAllProductsShortForAdmin(Pageable pageable) {
+        log.info("Отображение всех продуктов (short) для админа");
+
+        Page<Product> products = productRepository.findAll(pageable);
+
+        return mapToShortDtoWithMainPicture(products);
+    }
+
     public ProductResponseAdminDto getProductBySlugForAdmin(String slug) {
         log.info("Отображение продукта для админа со slug={}", slug);
 

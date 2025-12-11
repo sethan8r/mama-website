@@ -42,6 +42,12 @@ public class ProductController {
         return productService.getAllProductsShort(pageable);
     }
 
+    @GetMapping("/admin/short")
+    public Page<ProductResponseShortDto> getAllProductsShortForAdmin(
+            @PageableDefault(size = 9, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
+        return productService.getAllProductsShortForAdmin(pageable);
+    }
+
     @GetMapping("/admin/{slug}")
     public ProductResponseAdminDto getProductBySlugForAdmin(@PathVariable String slug) {
         return productService.getProductBySlugForAdmin(slug);

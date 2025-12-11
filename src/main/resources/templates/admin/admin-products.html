@@ -356,12 +356,9 @@
         .product-image {
             width: 100%;
             height: 200px;
+            object-fit: cover;  /* ← Для картинки */
             background: rgba(220, 220, 200, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 3em;
-            color: #2d5f4f;
+            display: block;
         }
 
         .product-info {
@@ -535,6 +532,124 @@
                 width: 100%;
             }
         }
+
+        /* Панель управления */
+        .controls-panel {
+            background: rgba(200, 200, 180, 0.3);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .controls-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .control-button {
+            padding: 12px 25px;
+            background: linear-gradient(135deg, #2d5f4f 0%, #1a3d32 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1em;
+            font-family: 'Georgia', serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .control-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(45, 95, 79, 0.4);
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .filter-label {
+            color: #2d5f4f;
+            font-size: 1em;
+            font-weight: 500;
+        }
+
+        .filter-select {
+            padding: 10px 15px;
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid rgba(45, 95, 79, 0.3);
+            border-radius: 10px;
+            font-size: 1em;
+            color: #333;
+            cursor: pointer;
+            font-family: 'Georgia', serif;
+            transition: all 0.3s ease;
+        }
+
+        .filter-select:hover {
+            border-color: #2d5f4f;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: #2d5f4f;
+            box-shadow: 0 0 5px rgba(45, 95, 79, 0.3);
+        }
+
+        /* Бейджи статуса на карточках */
+        .product-badges {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            z-index: 10;
+        }
+
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            font-weight: 500;
+            display: inline-block;
+        }
+
+        .status-badge.unavailable {
+            background: rgba(255, 193, 7, 0.9);
+            color: #333;
+        }
+
+        .status-badge.deleted {
+            background: rgba(220, 53, 69, 0.9);
+            color: white;
+        }
+
+        /* Обновленный стиль карточки товара */
+        .product-item {
+            background: rgba(200, 200, 180, 0.3);
+            border-radius: 15px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            position: relative;  /* ← ДОБАВЬ ЭТО */
+        }
+
+        .product-item.unavailable {
+            opacity: 0.8;
+            border: 2px solid rgba(255, 193, 7, 0.5);
+        }
+
+        .product-item.deleted {
+            opacity: 0.6;
+            border: 2px solid rgba(220, 53, 69, 0.5);
+        }
     </style>
 </head>
 <body>
@@ -639,6 +754,24 @@
                 </div>
             </div>
 
+            <div class="controls-panel">
+
+                <div class="controls-row">
+                    <button class="control-button" onclick="showAllProducts()">
+                        📋 Показать все товары
+                    </button>
+
+                    <div class="filter-group">
+                        <span class="filter-label">Фильтр:</span>
+                        <select id="filterSelect" class="filter-select" onchange="applyFilter()">
+                            <option value="all" selected>Все товары</option>
+                            <option value="unavailable">Только недоступные</option>
+                            <option value="deleted">Только удаленные</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
             <div id="productsContainer">
                 <!-- Продукты будут загружены через JS -->
             </div>
@@ -670,6 +803,8 @@
     let pageSize = 3;
     let currentSearchQuery = '';
     let isSearched = false;
+    let currentMode = 'none';  // ← ДОБАВЬ ЭТО ('none', 'search', 'all', 'filter')
+    let currentFilter = 'all'; // ← ДОБАВЬ ЭТО
 
     // Функция показа уведомлений
     function showNotification(title, message, type = 'error') {
@@ -697,6 +832,59 @@
         notification.addEventListener('click', () => {
             notification.remove();
         });
+    }
+
+    async function showAllProducts(page = 0) {
+        try {
+            currentMode = 'all';
+            currentFilter = document.getElementById('filterSelect').value;
+
+            const response = await fetch(`/api/product/admin/short?page=${page}&size=${pageSize}&sort=id,DESC`);
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                showNotification('Ошибка загрузки', errorData.message || 'Не удалось загрузить товары', 'error');
+                return;
+            }
+
+            const data = await response.json();
+            displayProducts(data);
+            isSearched = false;
+        } catch (error) {
+            console.error('Ошибка загрузки всех товаров:', error);
+            showNotification('Ошибка сети', 'Не удалось подключиться к серверу', 'error');
+        }
+    }
+
+    async function showAllProducts(page = 0) {
+        try {
+            currentMode = 'all';
+            currentFilter = document.getElementById('filterSelect').value;
+
+            const response = await fetch(`/api/product/admin/short?page=${page}&size=${pageSize}&sort=id,DESC`);
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                showNotification('Ошибка загрузки', errorData.message || 'Не удалось загрузить товары', 'error');
+                return;
+            }
+
+            const data = await response.json();
+            displayProducts(data);
+            isSearched = false;
+        } catch (error) {
+            console.error('Ошибка загрузки всех товаров:', error);
+            showNotification('Ошибка сети', 'Не удалось подключиться к серверу', 'error');
+        }
+    }
+
+    function filterProductsLocally(products) {
+        if (currentFilter === 'unavailable') {
+            return products.filter(p => !p.available && !p.deleted);
+        } else if (currentFilter === 'deleted') {
+            return products.filter(p => p.deleted);
+        }
+        return products; // 'all'
     }
 
     // Загрузка категорий для select
@@ -809,17 +997,18 @@
 
     // Поиск продуктов
     async function searchProducts(page = 0) {
-        currentSearchQuery = document.getElementById('searchInput').value.trim();
+        const searchQuery = document.getElementById('searchInput').value.trim();
 
-        if (!currentSearchQuery) {
-            showNotification('Внимание', 'Введите название для поиска', 'info');
+        if (!searchQuery) {
+            showNotification('Предупреждение', 'Введите название для поиска', 'info');
             return;
         }
 
         try {
-            const response = await fetch(
-                `/api/product/admin/search?name=${encodeURIComponent(currentSearchQuery)}&page=${page}&size=${pageSize}`
-            );
+            currentMode = 'search';
+            currentSearchQuery = searchQuery;
+
+            const response = await fetch(`/api/product/admin/search?name=${encodeURIComponent(searchQuery)}&page=${page}&size=${pageSize}`);
 
             if (!response.ok) {
                 const errorData = await response.json();
@@ -853,23 +1042,57 @@
             return;
         }
 
+        // Применяем фильтр на клиенте (если режим "все товары")
+        let products = data.content;
+        if (currentMode === 'all') {
+            products = filterProductsLocally(products);
+        }
+
+        if (products.length === 0) {
+            container.innerHTML = '<div class="empty-results">Нет товаров по выбранному фильтру</div>';
+            document.getElementById('paginationContainer').style.display = 'none';
+            return;
+        }
+
         const grid = document.createElement('div');
         grid.className = 'products-grid';
 
-        data.content.forEach(product => {
+        products.forEach(product => {
             const productItem = document.createElement('div');
             productItem.className = 'product-item';
+
+            // Добавляем классы для визуального отображения статуса
+            if (product.deleted) {
+                productItem.classList.add('deleted');
+            } else if (!product.available) {
+                productItem.classList.add('unavailable');
+            }
+
             productItem.onclick = function() {
                 window.location.href = `/admin/products/${product.slug}`;
             };
 
+            // ИСПРАВЛЕНО: Теперь показывает реальную картинку вместо эмодзи 📦
+            const imageUrl = product.mainPictureUrl || '/images/logo.png';
+
+            // Создаем бейджи статуса
+            let badges = '';
+            if (product.deleted) {
+                badges += '<span class="status-badge deleted">Удалён</span>';
+            }
+            if (!product.available && !product.deleted) {
+                badges += '<span class="status-badge unavailable">Недоступен</span>';
+            }
+
             productItem.innerHTML = `
-                <div class="product-image">📦</div>
-                <div class="product-info">
-                    <div class="product-name">${product.name}</div>
-                    ${product.price ? `<div class="product-price">${product.price}</div>` : ''}
-                </div>
-            `;
+            ${badges ? `<div class="product-badges">${badges}</div>` : ''}
+            <img src="${imageUrl}" alt="${product.name}" class="product-image"
+                 onerror="this.src='/images/logo.png'">
+            <div class="product-info">
+                <div class="product-name">${product.name}</div>
+                ${product.price ? `<div class="product-price">${product.price}</div>` : ''}
+            </div>
+        `;
             grid.appendChild(productItem);
         });
 
@@ -895,15 +1118,21 @@
     function changePage(direction) {
         const newPage = currentPage + direction;
         if (newPage >= 0 && newPage < totalPages) {
-            searchProducts(newPage);
+            if (currentMode === 'search') {
+                searchProducts(newPage);
+            } else if (currentMode === 'all') {
+                showAllProducts(newPage);
+            }
         }
     }
 
     // Изменение размера страницы
     function changePageSize() {
         pageSize = parseInt(document.getElementById('pageSize').value);
-        if (isSearched) {
+        if (currentMode === 'search') {
             searchProducts(0);
+        } else if (currentMode === 'all') {
+            showAllProducts(0);
         }
     }
 

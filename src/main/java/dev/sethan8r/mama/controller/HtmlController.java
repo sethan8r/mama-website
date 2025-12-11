@@ -30,6 +30,16 @@ public class HtmlController {
         return "pages/contacts";
     }
 
+    @GetMapping("/works")
+    public String works() {
+        return "pages/works";
+    }
+
+    @GetMapping("/products")
+    public String catalog() {
+        return "pages/catalog";
+    }
+
     @GetMapping("/admin")
     public String adminHome() {
         return "admin/admin-home";
