@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- Google Analytics -->
-    <th:block th:replace="~{fragments/analytics :: analytics}"></th:block>
+<!--    &lt;!&ndash; Google Analytics &ndash;&gt;-->
+<!--    <th:block th:replace="~{fragments/analytics :: analytics}"></th:block>-->
 
     <title>Каталог - ИндТурПошив</title>
     <style>
@@ -951,5 +951,6 @@
         loadAllProducts(0);
     });
 </script>
+<th:block th:replace="~{fragments/analytics-yandex :: yandex-metrika}"></th:block>
 </body>
 </html>
