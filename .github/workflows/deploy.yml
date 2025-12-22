@@ -34,5 +34,6 @@ jobs:
       - name: Verify deployment
         run: |
           ssh root@${{ vars.SERVER_IP }} << 'EOF'
+          cd /opt/mama-website
           docker-compose ps
           EOF
