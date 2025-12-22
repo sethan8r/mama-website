@@ -27,6 +27,7 @@ jobs:
           cd /opt/mama-website
           git pull origin master
           ./gradlew build -x test
+          docker-compose down
           docker-compose up -d --build
           EOF
 
