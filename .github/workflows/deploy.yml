@@ -1,0 +1,37 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches:
+      - master
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H ${{ vars.SERVER_IP }} >> ~/.ssh/known_hosts
+
+      - name: Deploy to VPS
+        run: |
+          ssh root@${{ vars.SERVER_IP }} << 'EOF'
+          cd /opt/mama-website
+          git pull origin master
+          ./gradlew build -x test
+          docker-compose up -d --build
+          EOF
+
+      - name: Verify deployment
+        run: |
+          ssh root@${{ vars.SERVER_IP }} << 'EOF'
+          docker-compose ps
+          EOF
