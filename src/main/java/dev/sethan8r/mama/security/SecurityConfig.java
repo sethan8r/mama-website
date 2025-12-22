@@ -52,6 +52,9 @@ public class SecurityConfig {
                             response.sendRedirect("/error/403");
                         })
                 )
+                .headers(headers -> headers //удалить если сломается сайт
+                        .frameOptions(frameOptions -> frameOptions.disable())
+                ) //надо для яндекс метрики. Защита переходит на Caddy
                 .csrf(csrf -> csrf.disable())
                 .build();
     }
