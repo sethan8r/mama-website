@@ -36,7 +36,7 @@ public class Product {
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true) //изначально LAZY
     @OrderBy("sortOrder ASC")
     @ToString.Exclude  // Исключаем из toString()  защищают от бесконечной рекурсии и OutOfMemoryError
     @EqualsAndHashCode.Exclude  // Исключаем из equals()/hashCode()  защищают от бесконечной рекурсии и OutOfMemoryError

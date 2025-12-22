@@ -4,9 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!--    &lt;!&ndash; Google Analytics &ndash;&gt;-->
-<!--    <th:block th:replace="~{fragments/analytics :: analytics}"></th:block>-->
-
     <title>Контакты - ИндТурПошив</title>
     <style>
         * {
@@ -119,6 +116,51 @@
             margin: 0 auto;
         }
 
+        /* Секция "О компании" на всю ширину */
+        .about-section {
+            background: rgba(200, 200, 180, 0.3);
+            border-radius: 15px;
+            padding: 40px;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .about-section h2 {
+            font-size: 2em;
+            color: #2d5f4f;
+            margin-bottom: 20px;
+            font-weight: normal;
+        }
+
+        .about-section p {
+            font-size: 1.2em;
+            color: #333;
+            line-height: 1.8;
+            max-width: 900px;
+            margin: 0 auto 25px;
+        }
+
+        /* Кнопка "Примеры работ" */
+        .works-button {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 15px 40px;
+            background: #2d5f4f;
+            color: #f5f5dc;
+            text-decoration: none;
+            border-radius: 25px;
+            font-size: 1.1em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(45, 95, 79, 0.3);
+        }
+
+        .works-button:hover {
+            background: #1a3d32;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(45, 95, 79, 0.5);
+        }
+
         /* Сетка контактов */
         .contacts-grid {
             display: grid;
@@ -181,9 +223,30 @@
             text-decoration: underline;
         }
 
-        .placeholder-text {
-            color: #999;
-            font-style: italic;
+        /* Важное предупреждение */
+        .warning-badge {
+            display: inline-block;
+            background: #d4a574;
+            color: #fff;
+            padding: 8px 18px;
+            border-radius: 20px;
+            font-size: 0.95em;
+            font-weight: 500;
+            margin-top: 10px;
+            box-shadow: 0 2px 8px rgba(212, 165, 116, 0.4);
+        }
+
+        /* Адрес с подсказкой */
+        .address-highlight {
+            background: rgba(45, 95, 79, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #2d5f4f;
+            margin-top: 10px;
+        }
+
+        .address-highlight strong {
+            color: #2d5f4f;
         }
 
         /* Секция с картой */
@@ -206,73 +269,16 @@
 
         .map-container {
             width: 100%;
-            height: 400px;
-            background: rgba(220, 220, 200, 0.5);
+            height: 450px;
             border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #666;
-            font-size: 1.2em;
-            border: 2px dashed rgba(45, 95, 79, 0.3);
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
 
-        .map-placeholder {
-            text-align: center;
-            padding: 40px;
-        }
-
-        .map-placeholder-icon {
-            font-size: 3em;
-            margin-bottom: 15px;
-        }
-
-        /* Секция "О компании" на всю ширину */
-        .about-section {
-            background: rgba(200, 200, 180, 0.3);
-            border-radius: 15px;
-            padding: 40px;
-            margin-bottom: 40px;
-            text-align: center;
-        }
-
-        .about-section h2 {
-            font-size: 2em;
-            color: #2d5f4f;
-            margin-bottom: 20px;
-            font-weight: normal;
-        }
-
-        .about-section p {
-            font-size: 1.2em;
-            color: #333;
-            line-height: 1.8;
-            max-width: 900px;
-            margin: 0 auto;
-        }
-
-        /* Рабочие часы */
-        .hours-list {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .hours-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px;
-            background: rgba(255, 255, 255, 0.5);
-            border-radius: 8px;
-        }
-
-        .hours-day {
-            color: #2d5f4f;
-            font-weight: 500;
-        }
-
-        .hours-time {
-            color: #333;
+        .map-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
         }
 
         /* Адаптивность */
@@ -325,6 +331,15 @@
             .map-container {
                 height: 300px;
             }
+
+            .about-section {
+                padding: 30px 20px;
+            }
+
+            .works-button {
+                padding: 12px 30px;
+                font-size: 1em;
+            }
         }
     </style>
 </head>
@@ -334,7 +349,7 @@
     <div class="header">
         <div class="header-left" onclick="window.location.href='/'">
             <img src="/images/logo.png" alt="Логотип" class="logo">
-            <h1>ИндТурПошив</h1>
+            <h1>ИндТурПошив - профессиональный пошив под задачи бизнеса и туризма</h1>
         </div>
         <div class="nav-buttons">
             <a href="/works" class="nav-button">Примеры работ</a>
@@ -355,10 +370,10 @@
             <div class="about-section">
                 <h2>ИндТурПошив</h2>
                 <p>
-                    Мы занимаемся пошивом качественной защитной экипировки для туристов,
-                    походников и путешественников. Также выполняем индивидуальные заказы
-                    в швейном деле: от ремонта одежды до создания уникальных изделий по вашим эскизам.
+                    Пошив изделий для рекламных акций: подарки, сувениры, брендирование изделий.
+                    Изготовление туристической защитной одежды для сплава по горным рекам.
                 </p>
+                <a href="/works" class="works-button">ПРИМЕРЫ РАБОТ</a>
             </div>
 
             <!-- Сетка контактов -->
@@ -372,15 +387,15 @@
                     <div class="contact-item">
                         <span class="contact-label">Для связи:</span>
                         <div class="contact-value">
-                            <a href="tel:+79991234567" class="placeholder-text">+7 (999) 123-45-67</a>
+                            <a href="tel:+79219472809">+7 (921) 947-28-09</a>
                         </div>
                     </div>
                     <div class="contact-item">
                         <span class="contact-label">Звонки принимаются:</span>
-                        <div class="contact-value placeholder-text">
-                            Пн-Пт: 9:00 - 18:00<br>
-                            Сб-Вс: выходной
+                        <div class="contact-value">
+                            Пн-Пт: 11:00 - 17:00
                         </div>
+                        <span class="warning-badge">⚠ Режим работы уточняйте по телефону</span>
                     </div>
                 </div>
 
@@ -393,19 +408,19 @@
                     <div class="contact-item">
                         <span class="contact-label">Email:</span>
                         <div class="contact-value">
-                            <a href="mailto:info@indturposhiv.ru" class="placeholder-text">info@indturposhiv.ru</a>
+                            <a href="mailto:marucha70@yandex.ru">marucha70@yandex.ru</a>
                         </div>
                     </div>
                     <div class="contact-item">
                         <span class="contact-label">WhatsApp:</span>
                         <div class="contact-value">
-                            <a href="https://wa.me/79991234567" class="placeholder-text">+7 (999) 123-45-67</a>
+                            <a href="https://wa.me/79219472809">+7 (921) 947-28-09</a>
                         </div>
                     </div>
                     <div class="contact-item">
                         <span class="contact-label">Telegram:</span>
                         <div class="contact-value">
-                            <a href="https://t.me/indturposhiv" class="placeholder-text">@indturposhiv</a>
+                            <a href="https://t.me/+79219472809">+7 (921) 947-28-09</a>
                         </div>
                     </div>
                 </div>
@@ -418,15 +433,18 @@
                     </h3>
                     <div class="contact-item">
                         <span class="contact-label">Мастерская:</span>
-                        <div class="contact-value placeholder-text">
-                            г. Москва, ул. Примерная, д. 10, оф. 5
+                        <div class="contact-value">
+                            г. Санкт-Петербург, Тобольская д. 1
                         </div>
                     </div>
                     <div class="contact-item">
                         <span class="contact-label">Метро:</span>
-                        <div class="contact-value placeholder-text">
-                            Маяковская (5 минут пешком)
+                        <div class="contact-value">
+                            Выборгская
                         </div>
+                    </div>
+                    <div class="address-highlight">
+                        <strong>Вход:</strong> Полуподвальное помещение на углу дома
                     </div>
                 </div>
 
@@ -436,36 +454,19 @@
                         <span class="contact-icon">🕐</span>
                         Режим работы
                     </h3>
-                    <div class="hours-list">
-                        <div class="hours-item">
-                            <span class="hours-day">Понедельник</span>
-                            <span class="hours-time placeholder-text">9:00 - 18:00</span>
-                        </div>
-                        <div class="hours-item">
-                            <span class="hours-day">Вторник</span>
-                            <span class="hours-time placeholder-text">9:00 - 18:00</span>
-                        </div>
-                        <div class="hours-item">
-                            <span class="hours-day">Среда</span>
-                            <span class="hours-time placeholder-text">9:00 - 18:00</span>
-                        </div>
-                        <div class="hours-item">
-                            <span class="hours-day">Четверг</span>
-                            <span class="hours-time placeholder-text">9:00 - 18:00</span>
-                        </div>
-                        <div class="hours-item">
-                            <span class="hours-day">Пятница</span>
-                            <span class="hours-time placeholder-text">9:00 - 18:00</span>
-                        </div>
-                        <div class="hours-item">
-                            <span class="hours-day">Суббота</span>
-                            <span class="hours-time placeholder-text">Выходной</span>
-                        </div>
-                        <div class="hours-item">
-                            <span class="hours-day">Воскресенье</span>
-                            <span class="hours-time placeholder-text">Выходной</span>
+                    <div class="contact-item">
+                        <span class="contact-label">Понедельник - Пятница:</span>
+                        <div class="contact-value">
+                            11:00 - 17:00
                         </div>
                     </div>
+                    <div class="contact-item">
+                        <span class="contact-label">Суббота - Воскресенье:</span>
+                        <div class="contact-value">
+                            Выходной
+                        </div>
+                    </div>
+                    <span class="warning-badge">⚠ Режим работы уточняйте по телефону</span>
                 </div>
             </div>
 
@@ -478,17 +479,16 @@
                 <div class="map-container">
                     <iframe
                             src="https://yandex.ru/map-widget/v1/?ll=30.341072%2C59.972147&z=17&pt=30.341072%2C59.972147%2Cpm2rdm"
-                            width="100%"
-                            height="450"
-                            frameborder="0"
-                            allowfullscreen="true"
-                            style="position:relative; border-radius: 10px;">
+                            allowfullscreen="true">
                     </iframe>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Яндекс.Метрика -->
 <th:block th:replace="~{fragments/analytics-yandex :: yandex-metrika}"></th:block>
+
 </body>
 </html>

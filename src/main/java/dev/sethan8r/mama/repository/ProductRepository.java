@@ -21,7 +21,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Page<Product> findByDeletedFalse(Pageable pageable);
 
 
-    @EntityGraph(attributePaths = "picturesProduct")
+    @EntityGraph(attributePaths = "picturesProduct") //изначально LAZY
     Optional<Product> findBySlug(String slug);
 
     Page<Product> findByNameContainingIgnoreCase(String name,  Pageable pageable);
