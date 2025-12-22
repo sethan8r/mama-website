@@ -3,27 +3,33 @@ services:
     image: postgres:15
     container_name: mama_postgres
     environment:
-      POSTGRES_DB: mama_db
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: sethan8r
-    ports:
-      - "5432:5432"
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - mama-network
+    restart: unless-stopped
 
   app:
     build: .
     container_name: mama_app
     ports:
       - "8080:8080"
-    volumes:
-      - C:/logs:/app/logs
     depends_on:
       - postgres
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/mama_db
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: sethan8r
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+    networks:
+      - mama-network
+    restart: unless-stopped
 
 volumes:
   postgres_data:
+
+networks:
+  mama-network:
+    driver: bridge
