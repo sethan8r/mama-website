@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
 
-<!--    &lt;!&ndash; Google Analytics &ndash;&gt;-->
-<!--    <th:block th:replace="~{fragments/analytics :: analytics}"></th:block>-->
+    <!--    &lt;!&ndash; Google Analytics &ndash;&gt;-->
+    <!--    <th:block th:replace="~{fragments/analytics :: analytics}"></th:block>-->
 
     <title>ИндТурПошив</title>
     <style>
@@ -144,19 +144,51 @@
         }
 
         .content-section h2 {
-            font-size: 2.2em;
+            font-size: 1.1em;
             margin-bottom: 25px;
-            color: #2d5f4f;
+            color: white;
             font-weight: normal;
             cursor: pointer;
-            transition: color 0.3s ease;
-            display: inline-block;
-            border-bottom: 2px solid transparent;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 28px;
+            background: linear-gradient(135deg, #9fb08a 0%, #8ba077 100%);
+            border: 2px solid #6b7a5a;
+            border-radius: 50px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
 
         .content-section h2:hover {
-            color: #1a3d32;
-            border-bottom: 2px solid #2d5f4f;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+            background: linear-gradient(135deg, #afc19a 0%, #9bb087 100%);
+        }
+
+        .content-section h2:active {
+            transform: translateY(-1px);
+        }
+
+        .content-section h2::before {
+            font-size: 1.3em;
+            transform: translateY(-2px);  /* ← Меняй это значение */
+            display: inline-block;
+        }
+
+        .content-section:nth-child(1) h2::before {
+            content: '🖼️';
+        }
+
+        .content-section:nth-child(3) h2::before {
+            content: '🛒';
+            transform: translateY(-3px);  /* ← Меняй это значение */
+            display: inline-block;
+        }
+
+        .content-section h2::after {
+            content: '→';
+            margin-left: 8px;
         }
 
         /* Карусель */
@@ -279,6 +311,131 @@
             background: linear-gradient(to right, transparent, #2d5f4f, transparent);
             margin: 50px 0;
         }
+
+        /* ⬇️ МОДАЛЬНОЕ ОКНО */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 25px;
+            border-bottom: 2px solid rgba(45, 95, 79, 0.1);
+            background: rgba(180, 180, 180, 0.1);
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 1.5em;
+            color: #2d5f4f;
+            font-weight: normal;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.8em;
+            color: #999;
+            cursor: pointer;
+            padding: 5px 10px;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .modal-close:hover {
+            color: #2d5f4f;
+            transform: rotate(90deg);
+        }
+
+        .modal-body {
+            padding: 25px;
+        }
+
+        .modal-image {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            object-fit: cover;
+        }
+
+        .modal-title {
+            font-size: 1.3em;
+            color: #2d5f4f;
+            margin: 0 0 15px 0;
+        }
+
+        .modal-description {
+            font-size: 0.95em;
+            color: #666;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .modal-footer {
+            padding: 20px 25px;
+            border-top: 1px solid rgba(45, 95, 79, 0.1);
+            background: rgba(180, 180, 180, 0.05);
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .modal-button {
+            padding: 10px 25px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: 'Georgia', serif;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            background: rgba(200, 200, 200, 0.5);
+            color: #333;
+        }
+
+        .modal-button:hover {
+            background: rgba(180, 180, 180, 0.7);
+        }
+
+        /* ⬆️ */
 
         /* Адаптивность */
         @media (max-width: 1400px) {
@@ -500,7 +657,55 @@
     </div>
 </div>
 
+<!-- ⬇️ МОДАЛЬНОЕ ОКНО ДЛЯ ПРИМЕРОВ РАБОТ -->
+<div id="worksModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="modalTitle">Название работы</h2>
+            <button class="modal-close" onclick="closeWorksModal()">×</button>
+        </div>
+        <div class="modal-body">
+            <img id="modalImage" src="" alt="Фото работы" class="modal-image">
+            <h3 id="modalWorkTitle" class="modal-title">Название</h3>
+            <p id="modalDescription" class="modal-description">Описание</p>
+        </div>
+        <div class="modal-footer">
+            <button class="modal-button" onclick="closeWorksModal()">Закрыть</button>
+        </div>
+    </div>
+</div>
+<!-- ⬆️ -->
+
 <script>
+    // ⬇️ ФУНКЦИИ ДЛЯ РАБОТЫ С МОДАЛЬНЫМ ОКНОМ ПРИМЕРОВ РАБОТ
+    function openWorksModal(workId, title, image, description) {
+        document.getElementById('modalTitle').textContent = title;
+        document.getElementById('modalWorkTitle').textContent = title;
+        document.getElementById('modalImage').src = image;
+        document.getElementById('modalDescription').textContent = description;
+        document.getElementById('worksModal').classList.add('show');
+    }
+
+    function closeWorksModal() {
+        document.getElementById('worksModal').classList.remove('show');
+    }
+
+    // Закрытие модала при клике на фон
+    document.getElementById('worksModal').addEventListener('click', function(event) {
+        if (event.target === this) {
+            closeWorksModal();
+        }
+    });
+
+    // Закрытие модала на Escape
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            closeWorksModal();
+        }
+    });
+
+    // ⬆️ ФУНКЦИИ ДЛЯ РАБОТЫ С МОДАЛЬНЫМ ОКНОМ ПРИМЕРОВ РАБОТ
+
     // Контейнер для уведомлений
     const notificationsContainer = document.createElement('div');
     notificationsContainer.className = 'notifications-container';
@@ -570,13 +775,25 @@
             data.content.forEach(work => {
                 const workItem = document.createElement('div');
                 workItem.className = 'carousel-item';
+
+                const mainPhoto = work.photos && work.photos.length > 0
+                    ? work.photos[0].photoUrl
+                    : '/images/placeholder.jpg';
+
                 workItem.innerHTML = `
                     <div class="carousel-item-image">
-                        <img src="${work.url}" alt="${work.name}">
+                        <img src="${mainPhoto}" alt="${work.title}">
                     </div>
-                    <div class="carousel-item-title">${work.name}</div>
+                    <div class="carousel-item-title">${work.title}</div>
                     <div class="carousel-item-description">${work.description || ''}</div>
                 `;
+
+                // ⬇️ ОТКРЫТИЕ МОДАЛЬНОГО ОКНА ПРИ КЛИКЕ
+                workItem.addEventListener('click', () => {
+                    openWorksModal(work.id, work.title, mainPhoto, work.description || 'Нет описания');
+                });
+                // ⬆️
+
                 worksCarousel.appendChild(workItem);
             });
         } catch (error) {
